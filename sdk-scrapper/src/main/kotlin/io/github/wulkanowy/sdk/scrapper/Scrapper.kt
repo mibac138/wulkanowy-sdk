@@ -50,6 +50,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import java.net.CookieManager
 import java.net.URL
 import java.time.LocalDate
+import java.util.concurrent.locks.ReentrantLock
 
 class Scrapper {
 
@@ -221,6 +222,7 @@ class Scrapper {
 
     private val okHttpFactory by lazy { OkHttpClientBuilderFactory() }
 
+    private val loginLock = ReentrantLock(true)
     private val serviceManager by resettableLazy(changeManager) {
         ServiceManager(
             okHttpClientBuilderFactory = okHttpFactory,
@@ -242,6 +244,7 @@ class Scrapper {
             androidVersion = androidVersion,
             buildTag = buildTag,
             userAgentTemplate = userAgentTemplate,
+            loginLock = loginLock,
         ).apply {
             appInterceptors.forEach { (interceptor, isNetwork) ->
                 setInterceptor(interceptor, isNetwork)
