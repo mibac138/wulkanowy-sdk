@@ -2,6 +2,7 @@ package io.github.wulkanowy.sdk
 
 import io.github.wulkanowy.sdk.pojo.RegisterStudent
 import io.github.wulkanowy.sdk.pojo.RegisterUser
+import io.github.wulkanowy.sdk.scrapper.Scrapper
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -26,12 +27,14 @@ class SdkRemoteTest {
         val userPassword = "jan123"
         val host = "https://fakelog.cf/"
 
-        val sdk = Sdk()
-        val registerUser: RegisterUser = sdk.getUserSubjectsFromScrapper(
-            email = userEmail,
-            password = userPassword,
-            scrapperBaseUrl = host,
-        )
+        val initSdk = createSdk {
+            configureScrapper {
+                email = userEmail
+                password = userPassword
+                baseUrl = host
+            }
+        }
+        val registerUser: RegisterUser = initSdk.getUserSubjectsFromScrapper()
         val registerSymbol = registerUser.symbols
             .filter { it.schools.isNotEmpty() }
             .first { it.schools.all { school -> school.subjects.isNotEmpty() } }
@@ -39,16 +42,18 @@ class SdkRemoteTest {
         val registerStudent = registerUnit.subjects.filterIsInstance<RegisterStudent>().first()
         val semester = registerStudent.semesters.last()
 
-        sdk.apply {
-            email = userEmail
-            password = userPassword
-            scrapperBaseUrl = host
-            loginType = Sdk.ScrapperLoginType.valueOf(registerUser.loginType?.name!!)
+        val sdk = createSdk {
+            configureScrapper {
+                email = userEmail
+                password = userPassword
+                baseUrl = host
+                loginType = Scrapper.LoginType.valueOf(registerUser.loginType?.name!!)
 
-            symbol = registerSymbol.symbol
-            schoolSymbol = registerUnit.schoolId
-            studentId = registerStudent.studentId
-            diaryId = semester.diaryId
+                symbol = registerSymbol.symbol
+                schoolSymbol = registerUnit.schoolId
+                studentId = registerStudent.studentId
+                diaryId = semester.diaryId
+            }
         }
 
         val grades = sdk.getGrades(semester.semesterId)
@@ -60,33 +65,37 @@ class SdkRemoteTest {
 
     @Test
     fun getStudents_scrapper() {
-        val sdk = Sdk().apply {
-            // mode = Sdk.Mode.SCRAPPER
+        val sdk = createSdk {
+            configureScrapper {
+                email = "jan@fakelog.cf"
+                password = "jan123"
+                baseUrl = "http://fakelog.cf"
+                symbol = "powiatwulkanowy"
+            }
         }
 
-        val students = runBlocking {
-            sdk.getUserSubjectsFromScrapper(email = "jan@fakelog.cf", password = "jan123", scrapperBaseUrl = "http://fakelog.cf", symbol = "powiatwulkanowy")
-        }.symbols.flatMap { it.schools }.flatMap { it.subjects }
+        val students = runBlocking { sdk.getUserSubjectsFromScrapper() }.symbols.flatMap { it.schools }.flatMap { it.subjects }
         assertEquals(6, students.size)
     }
 
     @Test
     fun getGrades_scrapper() = runTest {
-        val sdk = Sdk().apply {
-            userAgentTemplate = "custom UA %1\$s%2\$s%3\$s%4\$s"
-            mode = Sdk.Mode.SCRAPPER
-            symbol = "powiatwulkanowy"
+        val sdk = createSdk {
+            configureScrapper {
+                userAgentTemplate = "custom UA %1\$s%2\$s%3\$s%4\$s"
+                symbol = "powiatwulkanowy"
 
-            schoolSymbol = "123456"
+                schoolSymbol = "123456"
 
-            diaryId = 15
-            schoolYear = 2019
-            studentId = 1
+                diaryId = 15
+                schoolYear = 2019
+                studentId = 1
 
-            loginType = Sdk.ScrapperLoginType.STANDARD
-            scrapperBaseUrl = "http://fakelog.cf"
-            email = "jan@fakelog.cf"
-            password = "jan123"
+                loginType = Scrapper.LoginType.STANDARD
+                baseUrl = "http://fakelog.cf"
+                email = "jan@fakelog.cf"
+                password = "jan123"
+            }
         }
 
         val grades = sdk.getGrades(1).details

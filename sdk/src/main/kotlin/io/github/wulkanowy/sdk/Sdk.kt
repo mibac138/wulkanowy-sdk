@@ -76,7 +76,7 @@ import java.net.CookieManager
 import java.time.LocalDate
 import java.time.ZoneId
 
-class Sdk {
+class Sdk internal constructor(config: SdkConfig) {
 
     enum class Mode {
         HEBE,
@@ -95,180 +95,75 @@ class Sdk {
     }
 
     private val scrapper = Scrapper()
-
     private val hebe = Hebe()
 
     private val registerTimeZone = ZoneId.of("Europe/Warsaw")
 
     var mode = Mode.SCRAPPER
 
-    var mobileBaseUrl = ""
-        set(value) {
-            field = value
-            hebe.baseUrl = value
-        }
+    init {
+        config.hebeConfig?.let {
+            hebe.baseUrl = it.baseUrl
+            hebe.keyId = it.keyId
+            hebe.privatePem = it.privatePem
+            hebe.schoolId = config.schoolSymbol!!
+            hebe.pupilId = config.studentId!!
+            hebe.deviceModel = it.deviceModel
+            when (val logStyle = it.logStyle) {
+                is LogStyle.Level -> {
+                    hebe.logLevel = logStyle.level
+                }
 
-    var keyId = ""
-        set(value) {
-            field = value
-            hebe.keyId = value
+                is LogStyle.Custom -> {
+                    hebe.logLevel = HttpLoggingInterceptor.Level.NONE
+                    val interceptor = HttpLoggingInterceptor(logStyle.logger).setLevel(HttpLoggingInterceptor.Level.BASIC)
+                    hebe.addInterceptor(interceptor)
+                }
+            }
         }
+        config.scrapperConfig?.let {
+            scrapper.baseUrl = it.baseUrl
+            scrapper.domainSuffix = it.domainSuffix
+            scrapper.isEduOne = it.isEduOne
+            scrapper.email = it.email
+            scrapper.password = it.password
+            scrapper.schoolId = config.schoolSymbol!!
+            scrapper.classId = it.classId
+            scrapper.studentId = config.studentId!!
+            scrapper.diaryId = it.diaryId
+            scrapper.unitId = it.unitId
+            scrapper.kindergartenDiaryId = it.kindergartenDiaryId
+            scrapper.schoolYear = it.schoolYear
+            scrapper.symbol = it.symbol
+            scrapper.loginType = it.loginType
+            scrapper.userAgentTemplate = it.userAgentTemplate
+            scrapper.androidVersion = it.androidVersion
+            scrapper.buildTag = it.buildTag
+            scrapper.emptyCookieJarInterceptor = it.emptyCookieJarInterceptor
+            when (val logStyle = it.logStyle) {
+                is LogStyle.Level -> {
+                    scrapper.logLevel = logStyle.level
+                }
 
-    var privatePem = ""
-        set(value) {
-            field = value
-            hebe.privatePem = privatePem
+                is LogStyle.Custom -> {
+                    scrapper.logLevel = HttpLoggingInterceptor.Level.NONE
+                    val interceptor = HttpLoggingInterceptor(logStyle.logger).setLevel(HttpLoggingInterceptor.Level.BASIC)
+                    scrapper.addInterceptor(interceptor)
+                }
+            }
         }
-
-    var scrapperBaseUrl = ""
-        set(value) {
-            field = value
-            scrapper.baseUrl = value
-        }
-
-    var domainSuffix: String = ""
-        set(value) {
-            field = value
-            scrapper.domainSuffix = value
-        }
-
-    var isEduOne = false
-        set(value) {
-            field = value
-            scrapper.isEduOne = value
-        }
-
-    var email = ""
-        set(value) {
-            field = value
-            scrapper.email = value
-        }
-
-    var password = ""
-        set(value) {
-            field = value
-            scrapper.password = value
-        }
-
-    var schoolSymbol = ""
-        set(value) {
-            field = value
-            scrapper.schoolId = value
-            hebe.schoolId = value
-        }
-
-    var classId = 0
-        set(value) {
-            field = value
-            scrapper.classId = value
-        }
-
-    var studentId = 0
-        set(value) {
-            field = value
-            scrapper.studentId = value
-            hebe.pupilId = value
-        }
-
-    var diaryId = 0
-        set(value) {
-            field = value
-            scrapper.diaryId = value
-        }
-
-    var unitId = 0
-        set(value) {
-            field = value
-            scrapper.unitId = value
-        }
-
-    var kindergartenDiaryId = 0
-        set(value) {
-            field = value
-            scrapper.kindergartenDiaryId = value
-        }
-
-    var schoolYear = 0
-        set(value) {
-            field = value
-            scrapper.schoolYear = value
-        }
-
-    var symbol = ""
-        set(value) {
-            field = value
-            scrapper.symbol = value
-        }
-
-    var loginType = ScrapperLoginType.AUTO
-        set(value) {
-            field = value
-            scrapper.loginType = Scrapper.LoginType.valueOf(value.name)
-        }
-
-    var logLevel = HttpLoggingInterceptor.Level.BASIC
-        set(value) {
-            field = value
-            hebe.logLevel = value
-            scrapper.logLevel = value
-        }
-
-    var userAgentTemplate = ""
-        set(value) {
-            field = value
-            scrapper.userAgentTemplate = value
-        }
+    }
 
     val userAgent: String
         get() = scrapper.userAgent
 
-    var androidVersion = "7.0"
-        set(value) {
-            field = value
-            scrapper.androidVersion = value
-        }
-
-    var buildTag = "SM-G950F Build/NRD90M"
-        set(value) {
-            field = value
-            hebe.deviceModel = value
-            scrapper.buildTag = value
-        }
-
-    var emptyCookieJarInterceptor: Boolean = false
-        set(value) {
-            field = value
-            scrapper.emptyCookieJarInterceptor = value
-        }
-
-    private val interceptors: MutableList<Pair<Interceptor, Boolean>> = mutableListOf()
-
-    fun setSimpleHttpLogger(logger: (String) -> Unit) {
-        logLevel = HttpLoggingInterceptor.Level.NONE
-        val interceptor = HttpLoggingInterceptor {
-            logger(it)
-        }.setLevel(HttpLoggingInterceptor.Level.BASIC)
-        addInterceptor(interceptor)
-    }
-
     fun addInterceptor(interceptor: Interceptor, network: Boolean = false) {
         scrapper.addInterceptor(interceptor, network)
         hebe.addInterceptor(interceptor, network)
-        interceptors.add(interceptor to network)
     }
 
     fun setAdditionalCookieManager(cookieManager: CookieManager) {
         scrapper.setAdditionalCookieManager(cookieManager)
-    }
-
-    @JvmOverloads
-    fun switchDiary(diaryId: Int, kindergartenDiaryId: Int, schoolYear: Int, unitId: Int = 0): Sdk {
-        return also {
-            it.diaryId = diaryId
-            it.kindergartenDiaryId = kindergartenDiaryId
-            it.schoolYear = schoolYear
-            it.unitId = unitId
-        }
     }
 
     suspend fun isSymbolNotExist(symbol: String): Boolean = withContext(Dispatchers.IO) {
@@ -283,35 +178,7 @@ class Sdk {
         scrapper.sendPasswordResetRequest(registerBaseUrl, symbol, email, captchaCode)
     }
 
-    suspend fun getUserSubjectsFromScrapper(
-        email: String,
-        password: String,
-        scrapperBaseUrl: String,
-        symbol: String = "Default",
-    ): RegisterUser = getUserSubjectsFromScrapper(
-        email = email,
-        password = password,
-        scrapperBaseUrl = scrapperBaseUrl,
-        domainSuffix = domainSuffix,
-        symbol = symbol,
-    )
-
-    suspend fun getUserSubjectsFromScrapper(
-        email: String,
-        password: String,
-        scrapperBaseUrl: String,
-        domainSuffix: String,
-        symbol: String,
-    ): RegisterUser = withContext(Dispatchers.IO) {
-        scrapper.let {
-            it.baseUrl = scrapperBaseUrl
-            it.domainSuffix = domainSuffix
-            it.email = email
-            it.password = password
-            it.symbol = symbol
-            it.getUserSubjects().mapUser()
-        }
-    }
+    suspend fun getUserSubjectsFromScrapper(): RegisterUser = withContext(Dispatchers.IO) { scrapper.getUserSubjects().mapUser() }
 
     suspend fun getStudentsFromHebe(
         token: String,
@@ -331,13 +198,9 @@ class Sdk {
     }
 
     suspend fun getStudentsHybrid(
-        email: String,
-        password: String,
-        scrapperBaseUrl: String,
-        startSymbol: String = "Default",
         firebaseToken: String? = null,
     ): RegisterUser = withContext(Dispatchers.IO) {
-        val scrapperUser = getUserSubjectsFromScrapper(email, password, scrapperBaseUrl, startSymbol)
+        val scrapperUser = getUserSubjectsFromScrapper()
         scrapperUser.copy(
             loginMode = Mode.HYBRID,
             symbols = scrapperUser.symbols
@@ -733,4 +596,72 @@ class Sdk {
             Mode.HEBE -> throw NotImplementedError("Not available in HEBE mode")
         }
     }
+}
+
+sealed class LogStyle {
+    class Level(val level: HttpLoggingInterceptor.Level) : LogStyle()
+    class Custom(internal val logger: (String) -> Unit) : LogStyle()
+}
+
+sealed class CommonSdkConfig {
+    var logStyle: LogStyle = LogStyle.Level(HttpLoggingInterceptor.Level.BASIC)
+    var buildTag = "SM-G950F Build/NRD90M"
+}
+
+class HebeConfig : CommonSdkConfig() {
+    var baseUrl = ""
+    var keyId = ""
+    var privatePem = ""
+    var deviceModel: String
+        get() = buildTag
+        set(value) {
+            buildTag = value
+        }
+}
+
+class ScrapperConfig : CommonSdkConfig() {
+    var baseUrl = ""
+    var domainSuffix: String = ""
+    var isEduOne = false
+    var email = ""
+    var password = ""
+    var classId = 0
+    var diaryId = 0
+    var unitId = 0
+    var kindergartenDiaryId = 0
+    var schoolYear = 0
+    var symbol = ""
+    var loginType = Scrapper.LoginType.AUTO
+    var userAgentTemplate = ""
+    var androidVersion = "7.0"
+    var emptyCookieJarInterceptor: Boolean = false
+}
+
+class SdkConfig {
+    internal var scrapperConfig: ScrapperConfig? = null
+    internal var hebeConfig: HebeConfig? = null
+    internal var schoolSymbol: String? = null
+    internal var studentId: Int? = null
+
+    fun configureScrapper(configure: ScrapperConfig.() -> Unit) = this.also {
+        scrapperConfig = ScrapperConfig().also(configure)
+    }
+
+    fun configureHebe(configure: HebeConfig.() -> Unit) = this.also {
+        hebeConfig = HebeConfig().also(configure)
+    }
+
+    fun withCommonLogStyle(style: LogStyle) = this.also {
+        scrapperConfig?.logStyle = style
+        hebeConfig?.logStyle = style
+    }
+
+    fun withSchoolSymbol(symbol: String) = this.also { schoolSymbol = symbol }
+
+    fun withStudentId(studentId: Int) = this.also { this.studentId = studentId }
+}
+
+fun createSdk(setup: SdkConfig.() -> Unit): Sdk {
+    val config = SdkConfig().apply(setup)
+    return Sdk(config)
 }
