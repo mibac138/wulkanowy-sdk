@@ -38,14 +38,11 @@ import java.net.HttpURLConnection
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-private val lock = ReentrantLock(true)
-
-private var studentModuleHeaders: ModuleHeaders? = null
-private var studentPlusModuleHeaders: ModuleHeaders? = null
-private var messagesModuleHeaders: ModuleHeaders? = null
+private val HOSTS = arrayOf("uonetplus-wiadomosciplus", "uonetplus-uczenplus", "uonetplus-uczen")
 
 internal class AutoLoginInterceptor(
     private val loginType: LoginType,
+    private val loginLock: ReentrantLock = ReentrantLock(true),
     private val cookieJarCabinet: CookieJarCabinet,
     private val emptyCookieJarIntercept: Boolean = false,
     private val notLoggedInCallback: suspend () -> LoginResult,
@@ -57,18 +54,17 @@ internal class AutoLoginInterceptor(
         private val logger = LoggerFactory.getLogger(this::class.java)
     }
 
+    private val headersByHost: MutableMap<String, ModuleHeaders> = mutableMapOf()
     private var lastError: Throwable? = null
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request: Request
-        val response: Response
         val uri = chain.request().url
         val url = uri.toString()
 
-        try {
-            request = chain.request()
+        return try {
+            val request = chain.request()
             checkRequest()
-            response = try {
+            val response = try {
                 chain.proceed(request.attachModuleHeaders())
             } catch (e: Throwable) {
                 if (e is VulcanClientError) {
@@ -83,14 +79,13 @@ internal class AutoLoginInterceptor(
                 saveModuleHeaders(html, uri)
             }
             lastError = null
+            response
         } catch (e: NotLoggedInException) {
-            return if (lock.tryLock()) {
+            if (loginLock.tryLock()) {
                 logger.debug("Not logged in. Login in...")
                 try {
                     val loginResult = runBlocking { notLoggedInCallback() }
-                    messagesModuleHeaders = null
-                    studentPlusModuleHeaders = null
-                    studentModuleHeaders = null
+                    headersByHost.clear()
 
                     val messages = getModuleCookies(UrlGenerator.Site.MESSAGES)
                     val student = when (loginResult.isStudentSchoolUseEduOne) {
@@ -104,6 +99,7 @@ internal class AutoLoginInterceptor(
                         "uczen" in uri.host -> student.getOrThrow()
                         else -> logger.info("Resource don't need further login anyway")
                     }
+
                     chain.proceed(chain.request().attachModuleHeaders())
                 } catch (e: IOException) {
                     lastError = e
@@ -118,11 +114,11 @@ internal class AutoLoginInterceptor(
                     throw IOException("Unknown exception on login", e)
                 } finally {
                     logger.debug("Login finished. Release lock")
-                    lock.unlock()
+                    loginLock.unlock()
                 }
             } else {
                 logger.debug("Wait for user to be logged in...")
-                lock.withLock {
+                loginLock.withLock {
                     lastError?.let {
                         when (it) {
                             is IOException -> throw it
@@ -135,17 +131,15 @@ internal class AutoLoginInterceptor(
                 chain.proceed(chain.request().attachModuleHeaders())
             }
         }
-
-        return response
     }
 
-    private fun getModuleCookies(site: UrlGenerator.Site): Result<Pair<HttpUrl, Document>> {
+    private fun getModuleCookies(site: UrlGenerator.Site): Result<Pair<HttpUrl, Document>?> {
         return runCatching { fetchModuleCookies(site) }
             .onFailure { logger.error("Error in $site login", it) }
             .onSuccess { (url, doc) -> saveModuleHeaders(doc, url) }
     }
 
-    private fun saveModuleHeaders(doc: Document, url: HttpUrl) {
+    private fun saveModuleHeaders(doc: Document, url: HttpUrl): Pair<HttpUrl, Document>? {
         val htmlContent = doc.select("script").html()
         val moduleHeaders = ModuleHeaders(
             token = getScriptParam("antiForgeryToken", htmlContent),
@@ -157,32 +151,20 @@ internal class AutoLoginInterceptor(
 
         if (moduleHeaders.token.isBlank()) {
             logger.info("There is no token found on $url")
-            return
+            return null
         }
-
-        when {
-            "uonetplus-wiadomosciplus" in url.host -> messagesModuleHeaders = moduleHeaders
-            "uonetplus-uczenplus" in url.host -> studentPlusModuleHeaders = moduleHeaders
-            "uonetplus-uczen" in url.host -> studentModuleHeaders = moduleHeaders
-        }
+        val host = HOSTS.find { it in url.host } ?: return null
+        headersByHost[host] = moduleHeaders
+        return url to doc
     }
 
-    private fun Request.attachModuleHeaders(): Request {
-        val headers = when {
-            "uonetplus-wiadomosciplus" in url.host -> messagesModuleHeaders
-            "uonetplus-uczenplus" in url.host -> studentPlusModuleHeaders
-            "uonetplus-uczen" in url.host -> studentModuleHeaders
-            else -> return this
-        }
-        logger.info("X-V-AppVersion: ${headers?.appVersion}")
+    private fun Request.attachModuleHeaders(headersByHost: Map<String, ModuleHeaders> = this@AutoLoginInterceptor.headersByHost): Request {
+        val headers = headersByHost.entries.find { (host) -> host in url.host }?.value ?: return this
+        logger.info("X-V-AppVersion: ${headers.appVersion}")
         return newBuilder()
-            .apply {
-                headers?.let {
-                    addHeader("X-V-RequestVerificationToken", it.token)
-                    addHeader("X-V-AppGuid", it.appGuid)
-                    addHeader("X-V-AppVersion", it.appVersion)
-                }
-            }
+            .addHeader("X-V-RequestVerificationToken", headers.token)
+            .addHeader("X-V-AppGuid", headers.appGuid)
+            .addHeader("X-V-AppVersion", headers.appVersion)
             .build()
     }
 
