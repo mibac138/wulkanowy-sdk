@@ -36,6 +36,7 @@ import retrofit2.HttpException
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 private val lock = ReentrantLock(true)
 
@@ -120,19 +121,16 @@ internal class AutoLoginInterceptor(
                     lock.unlock()
                 }
             } else {
-                try {
-                    logger.debug("Wait for user to be logged in...")
-                    lock.lock()
+                logger.debug("Wait for user to be logged in...")
+                lock.withLock {
                     lastError?.let {
                         when (it) {
                             is IOException -> throw it
                             else -> throw IOException("Unknown error on login", it)
                         }
                     } ?: logger.debug("There is no last exception")
-                } finally {
-                    lock.unlock()
-                    logger.debug("User logged in. Retry after login...")
                 }
+                logger.debug("User logged in. Retry after login...")
 
                 chain.proceed(chain.request().attachModuleHeaders())
             }
