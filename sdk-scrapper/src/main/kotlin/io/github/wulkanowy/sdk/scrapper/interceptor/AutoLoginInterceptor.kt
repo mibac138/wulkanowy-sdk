@@ -12,7 +12,6 @@ import io.github.wulkanowy.sdk.scrapper.Scrapper.LoginType.STANDARD
 import io.github.wulkanowy.sdk.scrapper.exception.VulcanClientError
 import io.github.wulkanowy.sdk.scrapper.getScriptParam
 import io.github.wulkanowy.sdk.scrapper.login.LoginResult
-import io.github.wulkanowy.sdk.scrapper.login.ModuleHeaders
 import io.github.wulkanowy.sdk.scrapper.login.NotLoggedInException
 import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator
 import io.github.wulkanowy.sdk.scrapper.repository.AccountRepository.Companion.SELECTOR_ADFS
@@ -41,8 +40,15 @@ import java.util.concurrent.locks.ReentrantLock
 
 private val HOSTS = arrayOf("uonetplus-wiadomosciplus", "uonetplus-uczenplus", "uonetplus-uczen")
 
+internal data class ModuleHeaders(
+    val token: String,
+    val appGuid: String,
+    val appVersion: String,
+)
+
 internal class AutoLoginInterceptor(
     private val loginType: LoginType,
+    private val headersByHost: MutableMap<String, ModuleHeaders> = mutableMapOf(),
     private val loginLock: ReentrantLock = ReentrantLock(true),
     private val cookieJarCabinet: CookieJarCabinet,
     private val emptyCookieJarIntercept: Boolean = false,
@@ -55,8 +61,6 @@ internal class AutoLoginInterceptor(
         @JvmStatic
         private val logger = LoggerFactory.getLogger(this::class.java)
     }
-
-    private val headersByHost: MutableMap<String, ModuleHeaders> = mutableMapOf()
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val uri = chain.request().url
