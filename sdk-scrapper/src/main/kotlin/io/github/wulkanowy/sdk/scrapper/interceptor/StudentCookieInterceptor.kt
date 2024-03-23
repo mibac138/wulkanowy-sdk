@@ -33,6 +33,7 @@ internal class StudentCookieInterceptor(
             }
         }
 
+        // This is probably used to refresh the cookies in the request (after setting them through cookieJarCabinet above)
         return chain.proceed(chain.request().newBuilder().build())
     }
 }
