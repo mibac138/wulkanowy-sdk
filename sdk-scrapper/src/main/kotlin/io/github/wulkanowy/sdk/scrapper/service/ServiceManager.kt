@@ -137,7 +137,7 @@ internal class ServiceManager(
     fun getSymbolService(): SymbolService {
         return getRetrofit(
             client = getClientBuilder(errIntercept = true, loginIntercept = false, separateJar = true),
-            baseUrl = urlGenerator.generateBase(UrlGenerator.Site.HOME),
+            baseUrl = urlGenerator.generateBase(UrlGenerator.Site.HOME).toString(),
             json = false,
         ).create()
     }

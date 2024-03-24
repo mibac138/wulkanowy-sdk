@@ -2,6 +2,7 @@ package io.github.wulkanowy.sdk.scrapper.login
 
 import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator.Site.LOGIN
 import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator.Site.STUDENT
+import okhttp3.HttpUrl
 import java.net.URL
 
 internal class UrlGenerator(
@@ -32,12 +33,12 @@ internal class UrlGenerator(
     fun getReferenceUrl() = "$schema://$host"
 
     fun generateWithSymbol(type: Site): String {
-        return "${generateBase(type).removeSuffix("/")}/$symbol/${if (type.isStudent) "$schoolId/" else ""}"
+        return generateBase(type).newBuilder().addPathSegment(symbol).also {
+            if (type.isStudent) it.addPathSegment(schoolId)
+        }.toString()
     }
 
-    fun generateBase(type: Site): String {
-        return "$schema://${type.subDomain}$domainSuffix.$host/"
-    }
+    fun generateBase(type: Site) = HttpUrl.Builder().scheme(schema).host("${type.subDomain}$domainSuffix.$host").build()
 
     fun createReferer(type: Site): String {
         return when (type) {
