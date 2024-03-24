@@ -82,7 +82,7 @@ class SdkRemoteTest {
     fun getGrades_scrapper() = runTest {
         val sdk = createSdk {
             configureScrapper {
-                userAgentTemplate = "custom UA %1\$s%2\$s%3\$s%4\$s"
+                userAgent = "custom UA"
                 symbol = "powiatwulkanowy"
 
                 schoolSymbol = "123456"

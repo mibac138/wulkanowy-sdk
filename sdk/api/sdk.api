@@ -31,7 +31,8 @@ public final class io/github/wulkanowy/sdk/LogStyle$Level : io/github/wulkanowy/
 
 public final class io/github/wulkanowy/sdk/ScrapperConfig : io/github/wulkanowy/sdk/CommonSdkConfig {
 	public fun <init> ()V
-	public final fun getAndroidVersion ()Ljava/lang/String;
+	public final fun androidUserAgent (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/wulkanowy/sdk/ScrapperConfig;
+	public static synthetic fun androidUserAgent$default (Lio/github/wulkanowy/sdk/ScrapperConfig;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/wulkanowy/sdk/ScrapperConfig;
 	public final fun getBaseUrl ()Ljava/lang/String;
 	public final fun getClassId ()I
 	public final fun getDiaryId ()I
@@ -44,9 +45,8 @@ public final class io/github/wulkanowy/sdk/ScrapperConfig : io/github/wulkanowy/
 	public final fun getSchoolYear ()I
 	public final fun getSymbol ()Ljava/lang/String;
 	public final fun getUnitId ()I
-	public final fun getUserAgentTemplate ()Ljava/lang/String;
+	public final fun getUserAgent ()Ljava/lang/String;
 	public final fun isEduOne ()Z
-	public final fun setAndroidVersion (Ljava/lang/String;)V
 	public final fun setBaseUrl (Ljava/lang/String;)V
 	public final fun setClassId (I)V
 	public final fun setDiaryId (I)V
@@ -60,7 +60,7 @@ public final class io/github/wulkanowy/sdk/ScrapperConfig : io/github/wulkanowy/
 	public final fun setSchoolYear (I)V
 	public final fun setSymbol (Ljava/lang/String;)V
 	public final fun setUnitId (I)V
-	public final fun setUserAgentTemplate (Ljava/lang/String;)V
+	public final fun setUserAgent (Ljava/lang/String;)V
 }
 
 public final class io/github/wulkanowy/sdk/Sdk {

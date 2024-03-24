@@ -131,15 +131,8 @@ internal val defaultUserAgentTemplate = buildString {
     append("Safari/%5\$s")
 }
 
-internal fun getFormattedString(
-    template: String,
-    androidVersion: String,
-    buildTag: String,
-    webKitRev: String = "537.36",
-    chromeRev: String = "120.0.0.0",
-): String {
-    return String.format(template, androidVersion, buildTag, webKitRev, chromeRev, webKitRev)
-}
+fun androidUserAgentString(androidVersion: String = "7.0", buildTag: String = "SM-G950F Build/NRD90M", webKitRev: String = "537.36", chromeRev: String = "120.0.0.0") =
+    String.format(defaultUserAgentTemplate, androidVersion, buildTag, webKitRev, chromeRev, webKitRev)
 
 internal fun isCurrentLoginHasEduOne(studentModuleUrls: List<String>, urlGenerator: UrlGenerator): Boolean {
     return studentModuleUrls.any {

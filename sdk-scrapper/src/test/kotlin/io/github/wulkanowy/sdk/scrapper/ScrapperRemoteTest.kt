@@ -18,7 +18,7 @@ import java.time.Month
 @Ignore
 class ScrapperRemoteTest : BaseTest() {
 
-    private var api = Scrapper()
+    private var api = Scrapper(userAgent = androidUserAgentString("9.0", buildTag = "Wulkanowy"))
 
     @Before
     fun setUp() {
@@ -35,8 +35,6 @@ class ScrapperRemoteTest : BaseTest() {
             diaryId = 101
             kindergartenDiaryId = 1
             classId = 1
-            androidVersion = "9.0"
-            buildTag = "Wulkanowy"
             emptyCookieJarInterceptor = false
             addInterceptor(
                 interceptor = {

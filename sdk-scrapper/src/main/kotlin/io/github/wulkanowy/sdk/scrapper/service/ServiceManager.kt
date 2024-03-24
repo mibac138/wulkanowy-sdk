@@ -55,9 +55,7 @@ internal class ServiceManager(
     loginLock: ReentrantLock,
     headersByHost: MutableMap<String, ModuleHeaders>,
     emptyCookieJarIntercept: Boolean,
-    androidVersion: String,
-    buildTag: String,
-    userAgentTemplate: String,
+    userAgent: String,
 ) {
 
     val urlGenerator by lazy {
@@ -112,7 +110,7 @@ internal class ServiceManager(
             notLoggedInCallback = ::userLogin,
             fetchModuleCookies = { site -> loginHelper.loginModule(site) },
         ) to false,
-        UserAgentInterceptor(androidVersion, buildTag, userAgentTemplate) to false,
+        UserAgentInterceptor(userAgent) to false,
         HttpErrorInterceptor() to false,
     )
 

@@ -54,7 +54,7 @@ import java.net.URL
 import java.time.LocalDate
 import java.util.concurrent.locks.ReentrantLock
 
-class Scrapper {
+class Scrapper(val userAgent: String = androidUserAgentString()) {
 
     // TODO: refactor
     enum class LoginType {
@@ -185,33 +185,6 @@ class Scrapper {
             field = value
         }
 
-    var userAgentTemplate: String = ""
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
-
-    var androidVersion: String = "11"
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
-
-    var buildTag: String = "Redmi Note 8T"
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
-
-    val userAgent: String
-        get() {
-            return try {
-                getFormattedString(userAgentTemplate.ifBlank { defaultUserAgentTemplate }, androidVersion, buildTag)
-            } catch (e: Throwable) {
-                getFormattedString(defaultUserAgentTemplate, androidVersion, buildTag)
-            }
-        }
-
     private val appInterceptors: MutableList<Pair<Interceptor, Boolean>> = mutableListOf()
 
     fun addInterceptor(interceptor: Interceptor, network: Boolean = false) {
@@ -244,9 +217,7 @@ class Scrapper {
             kindergartenDiaryId = kindergartenDiaryId,
             schoolYear = schoolYear,
             emptyCookieJarIntercept = emptyCookieJarInterceptor,
-            androidVersion = androidVersion,
-            buildTag = buildTag,
-            userAgentTemplate = userAgentTemplate,
+            userAgent = userAgent,
             loginLock = loginLock,
             headersByHost = headersByHost,
         ).apply {

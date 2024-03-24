@@ -1,18 +1,18 @@
 public final class io/github/wulkanowy/sdk/scrapper/Scrapper {
 	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun addInterceptor (Lokhttp3/Interceptor;Z)V
 	public static synthetic fun addInterceptor$default (Lio/github/wulkanowy/sdk/scrapper/Scrapper;Lokhttp3/Interceptor;ZILjava/lang/Object;)V
 	public final fun authorizePermission (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun deleteMessages (Ljava/util/List;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun excuseForAbsence (Ljava/util/List;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun excuseForAbsence$default (Lio/github/wulkanowy/sdk/scrapper/Scrapper;Ljava/util/List;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public final fun getAndroidVersion ()Ljava/lang/String;
 	public final fun getAttendance (Ljava/time/LocalDate;Ljava/time/LocalDate;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun getAttendance$default (Lio/github/wulkanowy/sdk/scrapper/Scrapper;Ljava/time/LocalDate;Ljava/time/LocalDate;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun getAttendanceSummary (Ljava/lang/Integer;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun getAttendanceSummary$default (Lio/github/wulkanowy/sdk/scrapper/Scrapper;Ljava/lang/Integer;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun getBaseUrl ()Ljava/lang/String;
-	public final fun getBuildTag ()Ljava/lang/String;
 	public final fun getClassId ()I
 	public final fun getCompletedLessons (Ljava/time/LocalDate;Ljava/time/LocalDate;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun getCompletedLessons$default (Lio/github/wulkanowy/sdk/scrapper/Scrapper;Ljava/time/LocalDate;Ljava/time/LocalDate;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
@@ -79,7 +79,6 @@ public final class io/github/wulkanowy/sdk/scrapper/Scrapper {
 	public final fun getToken (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getUnitId ()I
 	public final fun getUserAgent ()Ljava/lang/String;
-	public final fun getUserAgentTemplate ()Ljava/lang/String;
 	public final fun getUserSubjects (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun isEduOne ()Z
 	public final fun isSymbolNotExist (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -87,9 +86,7 @@ public final class io/github/wulkanowy/sdk/scrapper/Scrapper {
 	public final fun sendMessage (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun sendPasswordResetRequest (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun setAdditionalCookieManager (Ljava/net/CookieManager;)V
-	public final fun setAndroidVersion (Ljava/lang/String;)V
 	public final fun setBaseUrl (Ljava/lang/String;)V
-	public final fun setBuildTag (Ljava/lang/String;)V
 	public final fun setClassId (I)V
 	public final fun setDiaryId (I)V
 	public final fun setDomainSuffix (Ljava/lang/String;)V
@@ -107,7 +104,6 @@ public final class io/github/wulkanowy/sdk/scrapper/Scrapper {
 	public final fun setStudentId (I)V
 	public final fun setSymbol (Ljava/lang/String;)V
 	public final fun setUnitId (I)V
-	public final fun setUserAgentTemplate (Ljava/lang/String;)V
 	public final fun unregisterDevice (ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -125,6 +121,8 @@ public final class io/github/wulkanowy/sdk/scrapper/Scrapper$LoginType : java/la
 }
 
 public final class io/github/wulkanowy/sdk/scrapper/UtilsKt {
+	public static final fun androidUserAgentString (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+	public static synthetic fun androidUserAgentString$default (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Ljava/lang/String;
 	public static final fun getNormalizedSymbol (Ljava/lang/String;)Ljava/lang/String;
 }
 

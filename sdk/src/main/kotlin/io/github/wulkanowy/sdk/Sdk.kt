@@ -68,6 +68,7 @@ import io.github.wulkanowy.sdk.pojo.Teacher
 import io.github.wulkanowy.sdk.pojo.Timetable
 import io.github.wulkanowy.sdk.pojo.Token
 import io.github.wulkanowy.sdk.scrapper.Scrapper
+import io.github.wulkanowy.sdk.scrapper.androidUserAgentString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Interceptor
@@ -94,7 +95,7 @@ class Sdk internal constructor(config: SdkConfig) {
         ADFSLightCufs,
     }
 
-    private val scrapper = Scrapper()
+    private val scrapper: Scrapper
     private val hebe = Hebe()
 
     private val registerTimeZone = ZoneId.of("Europe/Warsaw")
@@ -121,7 +122,9 @@ class Sdk internal constructor(config: SdkConfig) {
                 }
             }
         }
-        config.scrapperConfig?.let {
+        if (config.scrapperConfig != null) {
+            val it = config.scrapperConfig!!
+            scrapper = Scrapper(userAgent = it.userAgent)
             scrapper.baseUrl = it.baseUrl
             scrapper.domainSuffix = it.domainSuffix
             scrapper.isEduOne = it.isEduOne
@@ -136,9 +139,6 @@ class Sdk internal constructor(config: SdkConfig) {
             scrapper.schoolYear = it.schoolYear
             scrapper.symbol = it.symbol
             scrapper.loginType = it.loginType
-            scrapper.userAgentTemplate = it.userAgentTemplate
-            scrapper.androidVersion = it.androidVersion
-            scrapper.buildTag = it.buildTag
             scrapper.emptyCookieJarInterceptor = it.emptyCookieJarInterceptor
             when (val logStyle = it.logStyle) {
                 is LogStyle.Level -> {
@@ -151,6 +151,8 @@ class Sdk internal constructor(config: SdkConfig) {
                     scrapper.addInterceptor(interceptor)
                 }
             }
+        } else {
+            scrapper = Scrapper()
         }
     }
 
@@ -632,9 +634,12 @@ class ScrapperConfig : CommonSdkConfig() {
     var schoolYear = 0
     var symbol = ""
     var loginType = Scrapper.LoginType.AUTO
-    var userAgentTemplate = ""
-    var androidVersion = "7.0"
+    var userAgent: String = androidUserAgentString()
     var emptyCookieJarInterceptor: Boolean = false
+
+    fun androidUserAgent(androidVersion: String, buildTag: String, webkitRev: String = "537.36", chromeRev: String = "120.0.0.0") = this.also {
+        userAgent = androidUserAgentString(androidVersion, buildTag, webkitRev, chromeRev)
+    }
 }
 
 class SdkConfig {
