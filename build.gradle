@@ -161,6 +161,7 @@ dependencies {
     api project(":sdk")
     api project(":sdk-hebe")
     api project(":sdk-scrapper")
+    api project(":sdk-common")
 
     api "com.squareup.okhttp3:okhttp"
 }

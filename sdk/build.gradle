@@ -7,4 +7,5 @@ plugins {
 dependencies {
     implementation project(":sdk-hebe")
     implementation project(":sdk-scrapper")
+    implementation project(":sdk-common")
 }
