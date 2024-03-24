@@ -2,7 +2,6 @@ package io.github.wulkanowy.sdk.scrapper.service
 
 import io.github.wulkanowy.sdk.common.interceptor.NullInterceptor
 import io.github.wulkanowy.sdk.scrapper.CookieJarCabinet
-import io.github.wulkanowy.sdk.scrapper.OkHttpClientBuilderFactory
 import io.github.wulkanowy.sdk.scrapper.Scrapper
 import io.github.wulkanowy.sdk.scrapper.adapter.ObjectSerializer
 import io.github.wulkanowy.sdk.scrapper.exception.ScrapperException
@@ -32,7 +31,7 @@ import java.time.LocalDate
 import java.util.concurrent.locks.ReentrantLock
 
 internal class ServiceManager(
-    private val okHttpClientBuilderFactory: OkHttpClientBuilderFactory,
+    private val httpClient: OkHttpClient,
     private val cookieJarCabinet: CookieJarCabinet,
     loginType: Scrapper.LoginType,
     val urlGenerator: UrlGenerator,
@@ -196,7 +195,7 @@ internal class ServiceManager(
         loginIntercept: Boolean = true,
         separateJar: Boolean = false,
         block: OkHttpClient.Builder.() -> Unit = {},
-    ) = okHttpClientBuilderFactory.create()
+    ) = httpClient.newBuilder()
         .cookieJar(
             when {
                 separateJar -> JavaNetCookieJar(cookieJarCabinet.alternativeCookieManager)

@@ -18,6 +18,7 @@ import io.github.wulkanowy.sdk.scrapper.home.LastAnnouncement
 import io.github.wulkanowy.sdk.scrapper.home.LuckyNumber
 import io.github.wulkanowy.sdk.scrapper.homework.Homework
 import io.github.wulkanowy.sdk.scrapper.interceptor.ModuleHeaders
+import io.github.wulkanowy.sdk.scrapper.interceptor.UserAgentInterceptor
 import io.github.wulkanowy.sdk.scrapper.login.LoginHelper
 import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator
 import io.github.wulkanowy.sdk.scrapper.menu.Menu
@@ -51,8 +52,12 @@ import io.github.wulkanowy.sdk.scrapper.timetable.Timetable
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.net.CookieManager
+import java.security.KeyStore
 import java.time.LocalDate
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
+import javax.net.ssl.TrustManagerFactory
+import javax.net.ssl.X509TrustManager
 
 internal val httpClientWithBasicLogging = OkHttpClient().newBuilder().addNetworkInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)).build()
 
@@ -87,12 +92,10 @@ class Scrapper(
 
     var isEduOne = false
 
-    private val okHttpFactory = OkHttpClientBuilderFactory(host = urlGenerator.host, base = httpClient, userAgent = userAgent)
-
     private val headersByHost: MutableMap<String, ModuleHeaders> = mutableMapOf()
     private val loginLock = ReentrantLock(true)
     private val serviceManager = ServiceManager(
-        okHttpClientBuilderFactory = okHttpFactory,
+        httpClient = httpClient.configureForScrapper(urlGenerator.host, userAgent),
         cookieJarCabinet = cookieJarCabinet,
         loginType = loginType,
         urlGenerator = urlGenerator,
@@ -429,4 +432,35 @@ class Scrapper(
     suspend fun getLastTests(): List<String> = homepage.getLastTests()
 
     suspend fun getLastStudentLessons(): List<String> = homepage.getLastStudentLessons()
+}
+
+private const val TIMEOUT_IN_SECONDS = 30L
+internal fun OkHttpClient.configureForScrapper(host: String, userAgent: String): OkHttpClient = this
+    .newBuilder()
+    .connectTimeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+    .callTimeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+    .writeTimeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+    .readTimeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
+    .apply {
+        when (host) {
+            "edu.gdansk.pl",
+            "edu.lublin.eu",
+            "eduportal.koszalin.pl",
+            "vulcan.net.pl",
+            -> {
+                sslSocketFactory(TLSSocketFactory(), getTrustManager())
+            }
+        }
+    }
+    .addInterceptor(UserAgentInterceptor(userAgent))
+    .build()
+
+private fun getTrustManager(): X509TrustManager {
+    val trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
+    trustManagerFactory.init(null as? KeyStore?)
+    val trustManagers = trustManagerFactory.trustManagers
+    if (trustManagers.size != 1 || trustManagers[0] !is X509TrustManager) {
+        throw IllegalStateException("Unexpected default trust managers: $trustManagers")
+    }
+    return trustManagers[0] as X509TrustManager
 }

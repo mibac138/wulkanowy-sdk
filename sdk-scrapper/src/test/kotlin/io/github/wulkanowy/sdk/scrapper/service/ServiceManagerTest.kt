@@ -2,8 +2,8 @@ package io.github.wulkanowy.sdk.scrapper.service
 
 import io.github.wulkanowy.sdk.scrapper.BaseLocalTest
 import io.github.wulkanowy.sdk.scrapper.CookieJarCabinet
-import io.github.wulkanowy.sdk.scrapper.OkHttpClientBuilderFactory
 import io.github.wulkanowy.sdk.scrapper.Scrapper
+import io.github.wulkanowy.sdk.scrapper.configureForScrapper
 import io.github.wulkanowy.sdk.scrapper.exception.ScrapperException
 import io.github.wulkanowy.sdk.scrapper.exception.ServiceUnavailableException
 import io.github.wulkanowy.sdk.scrapper.interceptor.ErrorInterceptorTest
@@ -11,6 +11,7 @@ import io.github.wulkanowy.sdk.scrapper.login.LoginTest
 import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator
 import io.github.wulkanowy.sdk.scrapper.notes.NotesTest
 import kotlinx.coroutines.runBlocking
+import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -23,7 +24,7 @@ class ServiceManagerTest : BaseLocalTest() {
     @Test
     fun interceptorTest() {
         val manager = ServiceManager(
-            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost", userAgent = ""),
+            httpClient = OkHttpClient().configureForScrapper(host = "fakelog.localhost", userAgent = ""),
             cookieJarCabinet = CookieJarCabinet(),
             loginType = Scrapper.LoginType.STANDARD,
             urlGenerator = UrlGenerator(
@@ -58,7 +59,7 @@ class ServiceManagerTest : BaseLocalTest() {
         server.enqueue(MockResponse().setBody(NotesTest::class.java.getResource("UwagiIOsiagniecia.json").readText()))
         server.start(3000)
         val manager = ServiceManager(
-            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost", userAgent = ""),
+            httpClient = OkHttpClient().configureForScrapper(host = "fakelog.localhost", userAgent = ""),
             cookieJarCabinet = CookieJarCabinet(),
             loginType = Scrapper.LoginType.STANDARD,
             urlGenerator = UrlGenerator(
@@ -128,7 +129,7 @@ class ServiceManagerTest : BaseLocalTest() {
         server.enqueue(MockResponse().setResponseCode(503))
         server.start(3000)
         val manager = ServiceManager(
-            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost", userAgent = ""),
+            httpClient = OkHttpClient().configureForScrapper(host = "fakelog.localhost", userAgent = ""),
             cookieJarCabinet = CookieJarCabinet(),
             loginType = Scrapper.LoginType.STANDARD,
             urlGenerator = UrlGenerator(
