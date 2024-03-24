@@ -41,11 +41,16 @@ internal class ServiceManager(
     private val studentId: Int,
     private val diaryId: Int,
     private val kindergartenDiaryId: Int,
-    private val schoolYear: Int,
+    schoolYear: Int,
     loginLock: ReentrantLock,
     headersByHost: MutableMap<String, ModuleHeaders>,
     emptyCookieJarIntercept: Boolean,
 ) {
+
+    private val schoolYear = when (schoolYear) {
+        0 -> if (LocalDate.now().monthValue < 9) LocalDate.now().year - 1 else LocalDate.now().year // fallback
+        else -> schoolYear
+    }
 
     private val loginHelper by lazy {
         LoginHelper(
@@ -156,10 +161,7 @@ internal class ServiceManager(
                         diaryId = diaryId,
                         kindergartenDiaryId = kindergartenDiaryId,
                         studentId = studentId,
-                        schoolYear = when (schoolYear) {
-                            0 -> if (LocalDate.now().monthValue < 9) LocalDate.now().year - 1 else LocalDate.now().year // fallback
-                            else -> schoolYear
-                        },
+                        schoolYear = schoolYear,
                     ),
                 )
             }
