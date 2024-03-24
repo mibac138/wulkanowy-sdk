@@ -61,6 +61,16 @@ class Scrapper(
     val urlGenerator: UrlGenerator = UrlGenerator.Empty,
     val userAgent: String = androidUserAgentString(),
     httpClient: OkHttpClient = httpClientWithBasicLogging,
+    loginType: LoginType = LoginType.AUTO,
+    email: String = "",
+    password: String = "",
+    private val studentId: Int = 0,
+    private val classId: Int = 0,
+    private val diaryId: Int = 0,
+    private val unitId: Int = 0,
+    kindergartenDiaryId: Int = 0,
+    schoolYear: Int = 0,
+    emptyCookieJarInterceptor: Boolean = false,
 ) {
 
     // TODO: refactor
@@ -74,77 +84,9 @@ class Scrapper(
         ADFSLightCufs,
     }
 
-    private val changeManager = resettableManager()
-
     private val cookieJarCabinet = CookieJarCabinet()
 
     var isEduOne = false
-
-    var loginType: LoginType = LoginType.AUTO
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
-
-    var email: String = ""
-        set(value) {
-            if (field != value) {
-                changeManager.reset()
-                cookieJarCabinet.onUserChange()
-            }
-            field = value
-        }
-
-    var password: String = ""
-        set(value) {
-            if (field != value) {
-                changeManager.reset()
-                cookieJarCabinet.onUserChange()
-            }
-            field = value
-        }
-
-    var studentId: Int = 0
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
-
-    var classId: Int = 0
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
-
-    var diaryId: Int = 0
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
-
-    var unitId: Int = 0
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
-
-    var kindergartenDiaryId: Int = 0
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
-
-    var schoolYear: Int = 0
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
-
-    var emptyCookieJarInterceptor: Boolean = false
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
 
     private val appInterceptors: MutableList<Pair<Interceptor, Boolean>> = mutableListOf()
 
@@ -156,7 +98,7 @@ class Scrapper(
 
     private val headersByHost: MutableMap<String, ModuleHeaders> = mutableMapOf()
     private val loginLock = ReentrantLock(true)
-    private val serviceManager by resettableLazy(changeManager) {
+    private val serviceManager =
         ServiceManager(
             okHttpClientBuilderFactory = okHttpFactory,
             cookieJarCabinet = cookieJarCabinet,
@@ -176,34 +118,32 @@ class Scrapper(
                 setInterceptor(interceptor, isNetwork)
             }
         }
-    }
 
     private val symbolRepository by lazy { SymbolRepository(serviceManager.getSymbolService()) }
 
     private val account by lazy { AccountRepository(serviceManager.getAccountService()) }
 
-    private val register by resettableLazy(changeManager) {
-        RegisterRepository(
-            startSymbol = urlGenerator.symbol,
-            email = email,
-            password = password,
-            loginHelperFactory = { urlGenerator ->
-                LoginHelper(
-                    loginType = loginType,
-                    cookieJarCabinet = cookieJarCabinet,
-                    api = serviceManager.getLoginService(),
-                    urlGenerator = urlGenerator,
-                )
-            },
-            register = serviceManager.getRegisterService(),
-            student = serviceManager.getStudentService(withLogin = false, studentInterceptor = false),
-            studentPlus = serviceManager.getStudentPlusService(withLogin = false),
-            symbolService = serviceManager.getSymbolService(),
-            baseUrlGenerator = serviceManager.urlGenerator,
-        )
-    }
+    private val register = RegisterRepository(
+        startSymbol = urlGenerator.symbol,
+        email = email,
+        password = password,
+        loginHelperFactory = { urlGenerator ->
+            LoginHelper(
+                loginType = loginType,
+                cookieJarCabinet = cookieJarCabinet,
+                api = serviceManager.getLoginService(),
+                urlGenerator = urlGenerator,
+            )
+        },
+        register = serviceManager.getRegisterService(),
+        student = serviceManager.getStudentService(withLogin = false, studentInterceptor = false),
+        studentPlus = serviceManager.getStudentPlusService(withLogin = false),
+        symbolService = serviceManager.getSymbolService(),
+        baseUrlGenerator = serviceManager.urlGenerator,
+    )
 
-    private val studentStart: StudentStartRepository by resettableLazy(changeManager) {
+    private val studentStart by lazy {
+        // Lazy to avoid throwing exceptions about no student id (or other ids) set when just using the register functionality (only just searching for users)
         if (0 == studentId) throw ScrapperException("Student id is not set")
         if (0 == classId && 0 == kindergartenDiaryId) throw ScrapperException("Class id is not set")
         StudentStartRepository(
@@ -215,29 +155,24 @@ class Scrapper(
         )
     }
 
-    private val student: StudentRepository by resettableLazy(changeManager) {
+    private val student by lazy {
+        // Lazy to avoid throwing exceptions about no student id (or other ids) set when just using the register functionality (only just searching for users)
         StudentRepository(
             api = serviceManager.getStudentService(),
             forceSignIn = { serviceManager.loginModule(UrlGenerator.Site.STUDENT) },
         )
     }
 
-    private val studentPlus: StudentPlusRepository by resettableLazy(changeManager) {
-        StudentPlusRepository(
-            api = serviceManager.getStudentPlusService(),
-        )
-    }
+    private val studentPlus = StudentPlusRepository(
+        api = serviceManager.getStudentPlusService(),
+    )
 
-    private val messages: MessagesRepository by resettableLazy(changeManager) {
-        MessagesRepository(
-            api = serviceManager.getMessagesService(),
-            forceSignIn = { serviceManager.loginModule(UrlGenerator.Site.MESSAGES) },
-        )
-    }
+    private val messages = MessagesRepository(
+        api = serviceManager.getMessagesService(),
+        forceSignIn = { serviceManager.loginModule(UrlGenerator.Site.MESSAGES) },
+    )
 
-    private val homepage by resettableLazy(changeManager) {
-        HomepageRepository(serviceManager.getHomepageService())
-    }
+    private val homepage = HomepageRepository(serviceManager.getHomepageService())
 
     fun setAdditionalCookieManager(cookieManager: CookieManager) {
         cookieJarCabinet.setAdditionalCookieManager(cookieManager)

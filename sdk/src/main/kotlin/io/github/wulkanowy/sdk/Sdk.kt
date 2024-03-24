@@ -80,7 +80,7 @@ import java.net.URL
 import java.time.LocalDate
 import java.time.ZoneId
 
-class Sdk internal constructor(config: SdkConfig) {
+class Sdk internal constructor(private val config: SdkConfig) {
 
     enum class Mode {
         HEBE,
@@ -125,26 +125,7 @@ class Sdk internal constructor(config: SdkConfig) {
                 }
             }
         }
-        if (config.scrapperConfig != null) {
-            val it = config.scrapperConfig!!
-            val loggingInterceptor = it.logStyle.toLoggingInterceptor()
-            val httpClient = it.httpClient.newBuilder().addNetworkInterceptor(loggingInterceptor).build()
-            val urlGenerator = UrlGenerator(url = URL(it.baseUrl), domainSuffix = it.domainSuffix, schoolId = config.schoolSymbol!!, symbol = it.symbol)
-            scrapper = Scrapper(userAgent = it.userAgent, httpClient = httpClient, urlGenerator = urlGenerator)
-            scrapper.isEduOne = it.isEduOne
-            scrapper.email = it.email
-            scrapper.password = it.password
-            scrapper.classId = it.classId
-            scrapper.studentId = config.studentId!!
-            scrapper.diaryId = it.diaryId
-            scrapper.unitId = it.unitId
-            scrapper.kindergartenDiaryId = it.kindergartenDiaryId
-            scrapper.schoolYear = it.schoolYear
-            scrapper.loginType = it.loginType
-            scrapper.emptyCookieJarInterceptor = it.emptyCookieJarInterceptor
-        } else {
-            scrapper = Scrapper()
-        }
+        scrapper = config.createScrapperIfConfigured() ?: Scrapper()
     }
 
     val userAgent: String
@@ -203,15 +184,16 @@ class Sdk internal constructor(config: SdkConfig) {
                     } ?: return@mapNotNull null
                     val student = school.subjects
                         .firstOrNull() as? RegisterStudent ?: return@mapNotNull null
-                    scrapper.also {
-                        // TODO
-                        // it.symbol = symbol.symbol
-                        // it.schoolId = school.schoolId
-                        it.studentId = student.studentId
-                        it.diaryId = -1
-                        it.classId = student.classId
-                        it.loginType = Scrapper.LoginType.valueOf(scrapperUser.loginType!!.name)
-                    }
+
+                    TODO("Create scrapper using config copy constructor")
+                    // scrapper.also {
+                    //     it.symbol = symbol.symbol
+                    //     it.schoolId = school.schoolId
+                    //     it.studentId = student.studentId
+                    //     it.diaryId = -1
+                    //     it.classId = student.classId
+                    //     it.loginType = Scrapper.LoginType.valueOf(scrapperUser.loginType!!.name)
+                    // }
                     val token = scrapper.getToken()
                     val hebeUser = getStudentsFromHebe(
                         token = token.token,
@@ -667,6 +649,29 @@ class SdkConfig {
     fun withSchoolSymbol(symbol: String) = this.also { schoolSymbol = symbol }
 
     fun withStudentId(studentId: Int) = this.also { this.studentId = studentId }
+
+    // TODO copy constructor
+
+    internal fun createScrapperIfConfigured(): Scrapper? = scrapperConfig?.let {
+        val loggingInterceptor = it.logStyle.toLoggingInterceptor()
+        val httpClient = it.httpClient.newBuilder().addNetworkInterceptor(loggingInterceptor).build()
+        val urlGenerator = UrlGenerator(url = URL(it.baseUrl), domainSuffix = it.domainSuffix, schoolId = schoolSymbol!!, symbol = it.symbol)
+        Scrapper(
+            userAgent = it.userAgent,
+            httpClient = httpClient,
+            urlGenerator = urlGenerator,
+            email = it.email,
+            password = it.password,
+            classId = it.classId,
+            studentId = studentId!!,
+            diaryId = it.diaryId,
+            unitId = it.unitId,
+            kindergartenDiaryId = it.kindergartenDiaryId,
+            schoolYear = it.schoolYear,
+            loginType = it.loginType,
+            emptyCookieJarInterceptor = it.emptyCookieJarInterceptor,
+        ).also { scrapper -> scrapper.isEduOne = it.isEduOne }
+    }
 }
 
 fun createSdk(setup: SdkConfig.() -> Unit): Sdk {

@@ -106,10 +106,11 @@ class ServiceManagerTest : BaseLocalTest() {
         server.enqueue(MockResponse().setBody(LoginTest::class.java.getResource("Logowanie-brak-dostepu.html").readText()))
         server.start(3000)
 
-        val api = Scrapper(urlGenerator = UrlGenerator(schema = "http", host = "fakelog.localhost", symbol = "Default", port = 3000, schoolId = "123456")).apply {
-            email = "jan@fakelog.cf"
-            password = "jan123"
-        }
+        val api = Scrapper(
+            urlGenerator = UrlGenerator(schema = "http", host = "fakelog.localhost", symbol = "Default", port = 3000, schoolId = "123456"),
+            email = "jan@fakelog.cf",
+            password = "jan123",
+        )
 
         try {
             runBlocking { api.getUserSubjects() }

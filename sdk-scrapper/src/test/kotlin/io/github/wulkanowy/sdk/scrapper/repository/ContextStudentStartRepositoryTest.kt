@@ -14,17 +14,17 @@ import org.junit.Test
 
 class ContextStudentStartRepositoryTest : BaseLocalTest() {
 
-    private val api by lazy {
-        Scrapper(
+    private fun createApi(studentId: Int, classId: Int, loginType: Scrapper.LoginType = Scrapper.LoginType.STANDARD): Scrapper {
+        return Scrapper(
             urlGenerator = UrlGenerator(schema = "http", host = "fakelog.localhost", port = 3000, symbol = "Default", schoolId = "123456"),
             httpClient = OkHttpClient().newBuilder().addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)).build(),
-        ).apply {
-            loginType = Scrapper.LoginType.STANDARD
-            urlGenerator = UrlGenerator(schema = "http", host = "fakelog.localhost", port = 3000, symbol = "Default", schoolId = "123456")
-            email = "jan@fakelog.cf"
-            password = "jan123"
-            diaryId = 101
-        }
+            loginType = loginType,
+            email = "jan@fakelog.cf",
+            password = "jan123",
+            diaryId = 101,
+            studentId = studentId,
+            classId = classId,
+        )
     }
 
     @Test
@@ -34,8 +34,7 @@ class ContextStudentStartRepositoryTest : BaseLocalTest() {
             start(3000) //
         }
 
-        api.studentId = 1
-        api.classId = 1
+        val api = createApi(1, 1)
 
         val semesters = runBlocking { api.getSemesters() }
 
@@ -58,8 +57,7 @@ class ContextStudentStartRepositoryTest : BaseLocalTest() {
             start(3000) //
         }
 
-        api.studentId = 1
-        api.classId = 2 //
+        val api = createApi(1, 2)
 
         val semesters = runBlocking { api.getSemesters() }
 
@@ -73,8 +71,7 @@ class ContextStudentStartRepositoryTest : BaseLocalTest() {
             start(3000)
         }
 
-        api.studentId = 3881
-        api.classId = 121
+        val api = createApi(3881, 121)
 
         val semesters = runBlocking { api.getSemesters() }
 
@@ -91,8 +88,7 @@ class ContextStudentStartRepositoryTest : BaseLocalTest() {
             start(3000) //
         }
 
-        api.studentId = 2
-        api.classId = 2
+        val api = createApi(2, 2)
 
         val semesters = runBlocking { api.getSemesters() }
 
@@ -117,11 +113,7 @@ class ContextStudentStartRepositoryTest : BaseLocalTest() {
             start(3000) //
         }
 
-        with(api) {
-            studentId = 1
-            classId = 1
-            loginType = Scrapper.LoginType.STANDARD
-        }
+        val api = createApi(1, 1)
 
         val semesters = runBlocking { api.getSemesters() }
 
@@ -147,11 +139,7 @@ class ContextStudentStartRepositoryTest : BaseLocalTest() {
             start(3000) //
         }
 
-        with(api) {
-            studentId = 1
-            classId = 1
-            loginType = Scrapper.LoginType.ADFS
-        }
+        val api = createApi(1, 1, loginType = Scrapper.LoginType.ADFS)
 
         val semesters = runBlocking { api.getSemesters() }
 
@@ -177,11 +165,7 @@ class ContextStudentStartRepositoryTest : BaseLocalTest() {
             start(3000) //
         }
 
-        with(api) {
-            studentId = 1
-            classId = 1
-            loginType = Scrapper.LoginType.ADFSLight
-        }
+        val api = createApi(1, 1, Scrapper.LoginType.ADFSLight)
 
         val semesters = runBlocking { api.getSemesters() }
 
@@ -208,11 +192,7 @@ class ContextStudentStartRepositoryTest : BaseLocalTest() {
             start(3000) //
         }
 
-        with(api) {
-            studentId = 1
-            classId = 1
-            loginType = Scrapper.LoginType.ADFSCards
-        }
+        val api = createApi(1, 1, Scrapper.LoginType.ADFSCards)
 
         val semesters = runBlocking { api.getSemesters() }
 

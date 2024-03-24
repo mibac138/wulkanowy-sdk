@@ -21,19 +21,19 @@ class ScrapperRemoteTest : BaseTest() {
     private var api = Scrapper(
         userAgent = androidUserAgentString("9.0", buildTag = "Wulkanowy"),
         urlGenerator = UrlGenerator(schema = "https", host = "fakelog.cf", symbol = "powiatwulkanowy", schoolId = "123456"),
+        loginType = Scrapper.LoginType.STANDARD,
+        email = "jan@fakelog.cf",
+        password = "jan123",
+        studentId = 1,
+        diaryId = 101,
+        kindergartenDiaryId = 1,
+        classId = 1,
+        emptyCookieJarInterceptor = false,
     )
 
     @Before
     fun setUp() {
         api.apply {
-            loginType = Scrapper.LoginType.STANDARD
-            email = "jan@fakelog.cf"
-            password = "jan123"
-            studentId = 1
-            diaryId = 101
-            kindergartenDiaryId = 1
-            classId = 1
-            emptyCookieJarInterceptor = false
             addInterceptor(
                 interceptor = {
                     println("Request event ${it.request().url.host}")
