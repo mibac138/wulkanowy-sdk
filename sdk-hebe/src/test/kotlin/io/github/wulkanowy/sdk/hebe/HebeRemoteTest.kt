@@ -1,6 +1,7 @@
 package io.github.wulkanowy.sdk.hebe
 
 import kotlinx.coroutines.test.runTest
+import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -11,12 +12,17 @@ import java.time.LocalDate
 @Ignore
 class HebeRemoteTest {
 
-    private val hebe = Hebe(baseUrl = "https://api.fakelog.cf/powiatwulkanowy/", pupilId = 1234, schoolId = "008520", deviceModel = "Pixel 4a (5G)")
+    private val hebe = Hebe(
+        baseUrl = "https://api.fakelog.cf/powiatwulkanowy/",
+        pupilId = 1234,
+        schoolId = "008520",
+        deviceModel = "Pixel 4a (5G)",
+        httpClient = OkHttpClient().newBuilder().addNetworkInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)).build(),
+    )
 
     @Before
     fun setUp() {
         with(hebe) {
-            logLevel = HttpLoggingInterceptor.Level.BODY
             keyId = "///"
             privatePem = "///"
         }

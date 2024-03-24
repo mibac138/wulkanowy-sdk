@@ -1,5 +1,6 @@
 package io.github.wulkanowy.sdk.hebe
 
+import io.github.wulkanowy.sdk.hebe.interceptor.DeviceModelInterceptor
 import io.github.wulkanowy.sdk.hebe.models.Exam
 import io.github.wulkanowy.sdk.hebe.models.Grade
 import io.github.wulkanowy.sdk.hebe.models.GradeAverage
@@ -8,19 +9,12 @@ import io.github.wulkanowy.sdk.hebe.register.RegisterDevice
 import io.github.wulkanowy.sdk.hebe.register.StudentInfo
 import io.github.wulkanowy.sdk.hebe.repository.RepositoryManager
 import io.github.wulkanowy.signer.hebe.generateKeyPair
-import okhttp3.Interceptor
-import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.OkHttpClient
 import java.time.LocalDate
 
-class Hebe(val baseUrl: String = "", val schoolId: String = "", val pupilId: Int = -1, val deviceModel: String = "") {
+class Hebe(val baseUrl: String = "", val schoolId: String = "", val pupilId: Int = -1, val deviceModel: String = "", httpClient: OkHttpClient = OkHttpClient()) {
 
     private val resettableManager = resettableManager()
-
-    var logLevel = HttpLoggingInterceptor.Level.BASIC
-        set(value) {
-            field = value
-            resettableManager.reset()
-        }
 
     var keyId = ""
         set(value) {
@@ -35,23 +29,12 @@ class Hebe(val baseUrl: String = "", val schoolId: String = "", val pupilId: Int
         }
 
 
-    private val appInterceptors: MutableList<Pair<Interceptor, Boolean>> = mutableListOf()
-
-    fun addInterceptor(interceptor: Interceptor, network: Boolean = false) {
-        appInterceptors.add(interceptor to network)
-    }
-
     private val serviceManager by resettableLazy(resettableManager) {
         RepositoryManager(
-            logLevel = logLevel,
+            httpClient = httpClient.configureForHebe(deviceModel),
             keyId = keyId,
             privatePem = privatePem,
-            deviceModel = deviceModel,
-        ).apply {
-            appInterceptors.forEach { (interceptor, isNetwork) ->
-                setInterceptor(interceptor, isNetwork)
-            }
-        }
+        )
     }
 
     private val routes by resettableLazy(resettableManager) { serviceManager.getRoutesRepository() }
@@ -126,3 +109,8 @@ class Hebe(val baseUrl: String = "", val schoolId: String = "", val pupilId: Int
         )
     }
 }
+
+internal fun OkHttpClient.configureForHebe(deviceModel: String): OkHttpClient = this
+    .newBuilder()
+    .addInterceptor(DeviceModelInterceptor(deviceModel))
+    .build()

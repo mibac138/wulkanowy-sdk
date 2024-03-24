@@ -9,10 +9,12 @@ public final class io/github/wulkanowy/sdk/HebeConfig : io/github/wulkanowy/sdk/
 	public fun <init> ()V
 	public final fun getBaseUrl ()Ljava/lang/String;
 	public final fun getDeviceModel ()Ljava/lang/String;
+	public final fun getHttpClient ()Lokhttp3/OkHttpClient;
 	public final fun getKeyId ()Ljava/lang/String;
 	public final fun getPrivatePem ()Ljava/lang/String;
 	public final fun setBaseUrl (Ljava/lang/String;)V
 	public final fun setDeviceModel (Ljava/lang/String;)V
+	public final fun setHttpClient (Lokhttp3/OkHttpClient;)V
 	public final fun setKeyId (Ljava/lang/String;)V
 	public final fun setPrivatePem (Ljava/lang/String;)V
 }
@@ -66,8 +68,6 @@ public final class io/github/wulkanowy/sdk/ScrapperConfig : io/github/wulkanowy/
 }
 
 public final class io/github/wulkanowy/sdk/Sdk {
-	public final fun addHebeInterceptor (Lokhttp3/Interceptor;Z)V
-	public static synthetic fun addHebeInterceptor$default (Lio/github/wulkanowy/sdk/Sdk;Lokhttp3/Interceptor;ZILjava/lang/Object;)V
 	public final fun authorizePermission (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun deleteMessages (Ljava/util/List;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun deleteMessages$default (Lio/github/wulkanowy/sdk/Sdk;Ljava/util/List;ZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;

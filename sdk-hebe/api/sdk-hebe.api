@@ -1,9 +1,7 @@
 public final class io/github/wulkanowy/sdk/hebe/Hebe {
 	public fun <init> ()V
-	public fun <init> (Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;)V
-	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun addInterceptor (Lokhttp3/Interceptor;Z)V
-	public static synthetic fun addInterceptor$default (Lio/github/wulkanowy/sdk/hebe/Hebe;Lokhttp3/Interceptor;ZILjava/lang/Object;)V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Lokhttp3/OkHttpClient;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;Lokhttp3/OkHttpClient;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun getBaseUrl ()Ljava/lang/String;
 	public final fun getDeviceModel ()Ljava/lang/String;
 	public final fun getExams (Ljava/time/LocalDate;Ljava/time/LocalDate;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -11,7 +9,6 @@ public final class io/github/wulkanowy/sdk/hebe/Hebe {
 	public final fun getGradesAverage (ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getGradesSummary (ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getKeyId ()Ljava/lang/String;
-	public final fun getLogLevel ()Lokhttp3/logging/HttpLoggingInterceptor$Level;
 	public final fun getPrivatePem ()Ljava/lang/String;
 	public final fun getPupilId ()I
 	public final fun getSchoolId ()Ljava/lang/String;
@@ -19,7 +16,6 @@ public final class io/github/wulkanowy/sdk/hebe/Hebe {
 	public final fun register (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun register$default (Lio/github/wulkanowy/sdk/hebe/Hebe;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun setKeyId (Ljava/lang/String;)V
-	public final fun setLogLevel (Lokhttp3/logging/HttpLoggingInterceptor$Level;)V
 	public final fun setPrivatePem (Ljava/lang/String;)V
 }
 

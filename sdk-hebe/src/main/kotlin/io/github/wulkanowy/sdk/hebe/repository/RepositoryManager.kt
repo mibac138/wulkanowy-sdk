@@ -1,6 +1,6 @@
 package io.github.wulkanowy.sdk.hebe.repository
 
-import io.github.wulkanowy.sdk.hebe.interceptor.DeviceModelInterceptor
+import io.github.wulkanowy.sdk.common.addInterceptor
 import io.github.wulkanowy.sdk.hebe.interceptor.ErrorInterceptor
 import io.github.wulkanowy.sdk.hebe.interceptor.SignInterceptor
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -8,27 +8,20 @@ import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.create
 
 internal class RepositoryManager(
+    private val httpClient: OkHttpClient,
     private val keyId: String,
     private val privatePem: String,
-    private val deviceModel: String,
-    logLevel: HttpLoggingInterceptor.Level,
 ) {
 
     private val interceptors: MutableList<Pair<Interceptor, Boolean>> = mutableListOf(
-        HttpLoggingInterceptor().setLevel(logLevel) to true,
         ErrorInterceptor() to false,
     )
-
-    fun setInterceptor(interceptor: Interceptor, network: Boolean = false) {
-        interceptors.add(0, interceptor to network)
-    }
 
     @OptIn(ExperimentalSerializationApi::class)
     private val json by lazy {
@@ -77,20 +70,14 @@ internal class RepositoryManager(
                 }
             }
             .client(
-                OkHttpClient().newBuilder()
-                    .apply {
+                httpClient.newBuilder().apply {
                         if (signInterceptor) {
-                            addInterceptor(DeviceModelInterceptor(deviceModel))
                             addInterceptor(SignInterceptor(keyId, privatePem))
                         }
-                        interceptors.forEach {
-                            when {
-                                it.second -> addNetworkInterceptor(it.first)
-                                else -> addInterceptor(it.first)
-                            }
+                    interceptors.forEach { (interceptor, network) ->
+                        addInterceptor(interceptor, network)
                         }
-                    }
-                    .build(),
+                }.build(),
             )
     }
 }

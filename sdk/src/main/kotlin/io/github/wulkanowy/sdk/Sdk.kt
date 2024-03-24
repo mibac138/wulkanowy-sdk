@@ -72,7 +72,6 @@ import io.github.wulkanowy.sdk.scrapper.androidUserAgentString
 import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.net.CookieManager
@@ -112,11 +111,6 @@ class Sdk internal constructor(private val config: SdkConfig) {
 
     val userAgent: String
         get() = scrapper.userAgent
-
-    // TODO bring architectural improvements to hebe too
-    fun addHebeInterceptor(interceptor: Interceptor, network: Boolean = false) {
-        hebe.addInterceptor(interceptor, network)
-    }
 
     fun setAdditionalCookieManager(cookieManager: CookieManager) {
         scrapper.setAdditionalCookieManager(cookieManager)
@@ -577,6 +571,7 @@ sealed class CommonSdkConfig {
 }
 
 class HebeConfig : CommonSdkConfig() {
+    var httpClient = OkHttpClient()
     var baseUrl = ""
     var keyId = ""
     var privatePem = ""
@@ -656,22 +651,18 @@ class SdkConfig {
     }
 
     internal fun createHebeIfConfigured(): Hebe? = hebeConfig?.let {
-        val hebe = Hebe(baseUrl = it.baseUrl, schoolId = schoolSymbol!!, pupilId = studentId!!, deviceModel = it.deviceModel)
-        hebe.keyId = it.keyId
-        hebe.privatePem = it.privatePem
-        when (val logStyle = it.logStyle) {
-            is LogStyle.Level -> {
-                hebe.logLevel = logStyle.level
-            }
-
-            is LogStyle.Custom -> {
-                hebe.logLevel = HttpLoggingInterceptor.Level.NONE
-                val interceptor = HttpLoggingInterceptor(logStyle.logger).setLevel(HttpLoggingInterceptor.Level.BASIC)
-                hebe.addInterceptor(interceptor)
-            }
+        val loggingInterceptor = it.logStyle.toLoggingInterceptor()
+        val httpClient = it.httpClient.newBuilder().addNetworkInterceptor(loggingInterceptor).build()
+        Hebe(
+            baseUrl = it.baseUrl,
+            schoolId = schoolSymbol!!,
+            pupilId = studentId!!,
+            deviceModel = it.deviceModel,
+            httpClient = httpClient,
+        ).also { hebe ->
+            hebe.keyId = it.keyId
+            hebe.privatePem = it.privatePem
         }
-
-        hebe
     }
 }
 

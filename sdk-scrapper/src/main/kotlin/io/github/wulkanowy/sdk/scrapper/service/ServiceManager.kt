@@ -1,5 +1,6 @@
 package io.github.wulkanowy.sdk.scrapper.service
 
+import io.github.wulkanowy.sdk.common.addInterceptor
 import io.github.wulkanowy.sdk.common.interceptor.NullInterceptor
 import io.github.wulkanowy.sdk.scrapper.CookieJarCabinet
 import io.github.wulkanowy.sdk.scrapper.Scrapper
@@ -214,5 +215,3 @@ internal class ServiceManager(
         .also(block)
         .build()
 }
-
-private fun OkHttpClient.Builder.addInterceptor(interceptor: Interceptor, network: Boolean) = if (network) addNetworkInterceptor(interceptor) else addInterceptor(interceptor)

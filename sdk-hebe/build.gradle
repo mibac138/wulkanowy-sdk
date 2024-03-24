@@ -10,6 +10,8 @@ repositories {
 }
 
 dependencies {
+    implementation project(":sdk-common")
+
     implementation 'io.github.wulkanowy.signer:hebe-jvm:0.1.0-SNAPSHOT'
 
     implementation libs.retrofit.core
