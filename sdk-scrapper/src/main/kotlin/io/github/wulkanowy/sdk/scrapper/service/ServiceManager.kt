@@ -7,9 +7,11 @@ import io.github.wulkanowy.sdk.scrapper.TLSSocketFactory
 import io.github.wulkanowy.sdk.scrapper.adapter.ObjectSerializer
 import io.github.wulkanowy.sdk.scrapper.exception.ScrapperException
 import io.github.wulkanowy.sdk.scrapper.interceptor.AutoLoginInterceptor
+import io.github.wulkanowy.sdk.scrapper.interceptor.EmptyCookieJarInterceptor
 import io.github.wulkanowy.sdk.scrapper.interceptor.ErrorInterceptor
 import io.github.wulkanowy.sdk.scrapper.interceptor.HttpErrorInterceptor
 import io.github.wulkanowy.sdk.scrapper.interceptor.ModuleHeaders
+import io.github.wulkanowy.sdk.scrapper.interceptor.NullInterceptor
 import io.github.wulkanowy.sdk.scrapper.interceptor.StudentCookieInterceptor
 import io.github.wulkanowy.sdk.scrapper.interceptor.UserAgentInterceptor
 import io.github.wulkanowy.sdk.scrapper.login.LoginHelper
@@ -107,12 +109,11 @@ internal class ServiceManager(
             loginLock = loginLock,
             headersByHost = headersByHost,
             loginType = loginType,
-            cookieJarCabinet = cookieJarCabinet,
-            emptyCookieJarIntercept = emptyCookieJarIntercept,
             notLoggedInCallback = ::userLogin,
             json = json,
             fetchModuleCookies = { site -> loginHelper.loginModule(site) },
         ) to false,
+        (if (emptyCookieJarIntercept) EmptyCookieJarInterceptor(cookieJarCabinet.userCookieManager.cookieStore) else NullInterceptor) to false,
         UserAgentInterceptor(androidVersion, buildTag, userAgentTemplate) to false,
         HttpErrorInterceptor() to false,
     )

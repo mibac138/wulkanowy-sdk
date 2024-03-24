@@ -138,7 +138,6 @@ abstract class BaseLocalTest : BaseTest() {
         val urlGenerator = UrlGenerator(URL("http://localhost/"), "", "lodz", "")
         return AutoLoginInterceptor(
             loginType = loginType,
-            cookieJarCabinet = CookieJarCabinet(),
             notLoggedInCallback = {
                 when {
                     !autoLogin -> LoginResult(
