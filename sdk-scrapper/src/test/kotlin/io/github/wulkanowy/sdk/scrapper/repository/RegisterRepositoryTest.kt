@@ -19,7 +19,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.net.URL
 
 class RegisterRepositoryTest : BaseLocalTest() {
 
@@ -30,12 +29,14 @@ class RegisterRepositoryTest : BaseLocalTest() {
             startSymbol = symbol,
             email = "jan@fakelog.cf",
             password = "jan123",
-            loginHelper = LoginHelper(
+            loginHelperFactory = { urlGenerator ->
+                LoginHelper(
                 loginType = Scrapper.LoginType.STANDARD,
                 cookieJarCabinet = CookieJarCabinet(),
                 api = getService(LoginService::class.java, "http://fakelog.localhost:3000/"),
-                urlGenerator = UrlGenerator(URL("http://fakelog.localhost:3000/"), "", symbol, ""),
-            ),
+                    urlGenerator = urlGenerator,
+                )
+            },
             register = getService(
                 service = RegisterService::class.java,
                 url = "http://fakelog.localhost:3000/",
@@ -52,7 +53,7 @@ class RegisterRepositoryTest : BaseLocalTest() {
                     autoLoginInterceptorOn = false,
                 ),
             ),
-            url = UrlGenerator(
+            baseUrlGenerator = UrlGenerator(
                 schema = "http",
                 host = "fakelog.localhost",
                 port = 3000,

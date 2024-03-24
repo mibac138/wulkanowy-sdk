@@ -48,12 +48,12 @@ internal class RegisterRepository(
     private val startSymbol: String,
     private val email: String,
     private val password: String,
-    private val loginHelper: LoginHelper,
+    private val loginHelperFactory: (UrlGenerator) -> LoginHelper,
     private val register: RegisterService,
     private val student: StudentService,
     private val studentPlus: StudentPlusService,
     private val symbolService: SymbolService,
-    private val url: UrlGenerator,
+    private val baseUrlGenerator: UrlGenerator,
 ) {
 
     private companion object {
@@ -76,8 +76,8 @@ internal class RegisterRepository(
 
         return RegisterUser(
             email = emailAddress.ifBlank { email },
-            login = getNormalizedLogin(login, emailAddress).ifBlank { email },
-            baseUrl = url.getReferenceUrl(),
+            login = normalizedLogin(login, emailAddress).ifBlank { email },
+            baseUrl = baseUrlGenerator.getReferenceUrl(),
             loginType = symbolLoginType,
             symbols = getRegisterSymbols(
                 symbols = symbols,
@@ -92,13 +92,14 @@ internal class RegisterRepository(
         startLoginCert: CertificateResponse,
         symbolLoginType: Scrapper.LoginType,
     ): List<RegisterSymbol> = symbols.map { symbol ->
+        val urlGenerator = baseUrlGenerator.copy(symbol = symbol)
+        val loginHelper = loginHelperFactory(urlGenerator)
         val homeResponse = runCatching {
             if (symbols.size > 5) {
                 runCatching { symbolService.getSymbolPage(symbol) }
                     .onFailure { if (it is InvalidSymbolException) throw it }
             }
 
-            url.symbol = symbol
             val loginCert = when (startSymbol) {
                 symbol -> startLoginCert
                 else -> getCert(symbolLoginType)
@@ -120,7 +121,7 @@ internal class RegisterRepository(
         val schools = homeResponse.getOrNull()
             .toPermissions()
             .toUnitsMap()
-            .getRegisterUnits(userName, studentModuleUrls)
+            .getRegisterUnits(symbol, userName, studentModuleUrls)
 
         loginHelper.logout()
 
@@ -154,11 +155,11 @@ internal class RegisterRepository(
         }
     }
 
-    private suspend fun Map<PermissionUnit, AuthInfo?>.getRegisterUnits(userName: String, studentModuleUrls: List<String>): List<RegisterUnit> {
+    private suspend fun Map<PermissionUnit, AuthInfo?>.getRegisterUnits(symbol: String, userName: String, studentModuleUrls: List<String>): List<RegisterUnit> {
         return map { (unit, authInfo) ->
-            url.schoolId = unit.symbol
+            val urlGenerator = baseUrlGenerator.copy(symbol = symbol, schoolId = unit.symbol)
 
-            val isEduOne = isCurrentLoginHasEduOne(studentModuleUrls, url)
+            val isEduOne = isCurrentLoginHasEduOne(studentModuleUrls, urlGenerator)
             val cacheAndDiaries = runCatching {
                 if (authInfo?.parentIds.isNullOrEmpty() && authInfo?.studentIds.isNullOrEmpty()) {
                     null to emptyList()
@@ -206,7 +207,7 @@ internal class RegisterRepository(
         runCatching { symbolService.getSymbolPage(symbol) }
             .onFailure { if (it is InvalidSymbolException) throw it }
 
-        val urlGenerator = url.also { it.symbol = symbol }
+        val urlGenerator = baseUrlGenerator.copy(symbol = symbol)
         val page = register.getFormType(urlGenerator.generateWithSymbol(UrlGenerator.Site.LOGIN) + "Account/LogOn").page
         return when {
             page.select(SELECTOR_STANDARD).isNotEmpty() -> Scrapper.LoginType.STANDARD
@@ -228,14 +229,14 @@ internal class RegisterRepository(
         }
     }
 
-    private fun getNormalizedLogin(login: String, email: String): String = when (email) {
+    private fun normalizedLogin(login: String, email: String): String = when (email) {
         login.lowercase() -> email // AttributeName="name" contains entered email in standard login
         else -> login
     }
 
     private suspend fun getCert(symbolLoginType: Scrapper.LoginType): CertificateResponse {
         logger.debug("Register login type: {}", symbolLoginType)
-        return loginHelper
+        return loginHelperFactory(baseUrlGenerator)
             .apply { loginType = symbolLoginType }
             .sendCredentials(email, password)
     }
@@ -281,14 +282,14 @@ internal class RegisterRepository(
 
     // used only for check is student from parent account
     private suspend fun isStudentFromParentAccount(): Boolean? {
-        val studentPageUrl = url.generateWithSymbol(UrlGenerator.Site.STUDENT) + "LoginEndpoint.aspx"
+        val studentPageUrl = baseUrlGenerator.generateWithSymbol(UrlGenerator.Site.STUDENT) + "LoginEndpoint.aspx"
         val start = student.getStart(studentPageUrl)
 
         val startPage = when {
             "Working" in Jsoup.parse(start).title() -> {
                 val cert = certificateAdapter.fromHtml(start)
                 student.sendModuleCertificate(
-                    referer = url.createReferer(UrlGenerator.Site.STUDENT),
+                    referer = baseUrlGenerator.createReferer(UrlGenerator.Site.STUDENT),
                     url = cert.action,
                     certificate = mapOf(
                         "wa" to cert.wa,
@@ -302,7 +303,7 @@ internal class RegisterRepository(
         }
 
         val userCache = student.getUserCache(
-            url = url.generateWithSymbol(UrlGenerator.Site.STUDENT) + "UczenCache.mvc/Get",
+            url = baseUrlGenerator.generateWithSymbol(UrlGenerator.Site.STUDENT) + "UczenCache.mvc/Get",
             token = getScriptParam("antiForgeryToken", startPage),
             appGuid = getScriptParam("appGuid", startPage),
             appVersion = getScriptParam("version", startPage),
@@ -312,19 +313,19 @@ internal class RegisterRepository(
     }
 
     private suspend fun getStudentDiaries(): List<Diary> = student
-        .getSchoolInfo(url.generateWithSymbol(UrlGenerator.Site.STUDENT) + "UczenDziennik.mvc/Get")
+        .getSchoolInfo(baseUrlGenerator.generateWithSymbol(UrlGenerator.Site.STUDENT) + "UczenDziennik.mvc/Get")
         .handleErrors()
         .data.orEmpty()
 
     private suspend fun getEduOneDiaries(): List<Pair<Boolean, Diary>> {
-        val baseStudentPlus = url.generateWithSymbol(UrlGenerator.Site.STUDENT_PLUS)
+        val baseStudentPlus = baseUrlGenerator.generateWithSymbol(UrlGenerator.Site.STUDENT_PLUS)
         val studentPageUrl = baseStudentPlus + "LoginEndpoint.aspx"
         val start = student.getStart(studentPageUrl)
 
         if ("Working" in Jsoup.parse(start).title()) {
             val cert = certificateAdapter.fromHtml(start)
             student.sendModuleCertificate(
-                referer = url.createReferer(UrlGenerator.Site.STUDENT_PLUS),
+                referer = baseUrlGenerator.createReferer(UrlGenerator.Site.STUDENT_PLUS),
                 url = cert.action,
                 certificate = mapOf(
                     "wa" to cert.wa,

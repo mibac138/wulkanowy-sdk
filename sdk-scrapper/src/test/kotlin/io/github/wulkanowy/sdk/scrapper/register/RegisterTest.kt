@@ -15,26 +15,27 @@ import io.github.wulkanowy.sdk.scrapper.service.SymbolService
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.net.URL
 
 class RegisterTest : BaseLocalTest() {
 
-    private val login by lazy {
-        LoginHelper(
-            loginType = Scrapper.LoginType.STANDARD,
-            cookieJarCabinet = CookieJarCabinet(),
-            api = getService(
-                service = LoginService::class.java,
-                url = "http://fakelog.localhost:3000/",
-                html = true,
-                okHttp = getOkHttp(
-                    errorInterceptor = true,
-                    autoLoginInterceptorOn = false,
-                    loginType = Scrapper.LoginType.STANDARD,
+    private val loginFactory: (UrlGenerator) -> LoginHelper by lazy {
+        { urlGenerator ->
+            LoginHelper(
+                loginType = Scrapper.LoginType.STANDARD,
+                cookieJarCabinet = CookieJarCabinet(),
+                api = getService(
+                    service = LoginService::class.java,
+                    url = "http://fakelog.localhost:3000/",
+                    html = true,
+                    okHttp = getOkHttp(
+                        errorInterceptor = true,
+                        autoLoginInterceptorOn = false,
+                        loginType = Scrapper.LoginType.STANDARD,
+                    ),
                 ),
-            ),
-            urlGenerator = UrlGenerator(URL("http://fakelog.localhost:3000/"), "", "default", ""),
-        )
+                urlGenerator = urlGenerator,
+            )
+        }
     }
 
     private val registerStudent by lazy {
@@ -42,7 +43,7 @@ class RegisterTest : BaseLocalTest() {
             startSymbol = "default",
             email = "jan@fakelog.localhost",
             password = "jan123",
-            loginHelper = login,
+            loginHelperFactory = loginFactory,
             register = getService(
                 service = RegisterService::class.java,
                 url = "http://fakelog.localhost:3000/Default/",
@@ -63,7 +64,7 @@ class RegisterTest : BaseLocalTest() {
                     autoLoginInterceptorOn = false,
                 ),
             ),
-            url = UrlGenerator(
+            baseUrlGenerator = UrlGenerator(
                 schema = "http",
                 host = "fakelog.localhost",
                 port = 3000,

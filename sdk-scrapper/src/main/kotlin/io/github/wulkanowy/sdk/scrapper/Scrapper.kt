@@ -245,17 +245,19 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
             startSymbol = normalizedSymbol,
             email = email,
             password = password,
-            loginHelper = LoginHelper(
-                loginType = loginType,
-                cookieJarCabinet = cookieJarCabinet,
-                api = serviceManager.getLoginService(),
-                urlGenerator = serviceManager.urlGenerator,
-            ),
+            loginHelperFactory = { urlGenerator ->
+                LoginHelper(
+                    loginType = loginType,
+                    cookieJarCabinet = cookieJarCabinet,
+                    api = serviceManager.getLoginService(),
+                    urlGenerator = urlGenerator,
+                )
+            },
             register = serviceManager.getRegisterService(),
             student = serviceManager.getStudentService(withLogin = false, studentInterceptor = false),
             studentPlus = serviceManager.getStudentPlusService(withLogin = false),
             symbolService = serviceManager.getSymbolService(),
-            url = serviceManager.urlGenerator,
+            baseUrlGenerator = serviceManager.urlGenerator,
         )
     }
 

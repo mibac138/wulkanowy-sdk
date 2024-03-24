@@ -5,13 +5,13 @@ import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator.Site.STUDENT
 import okhttp3.HttpUrl
 import java.net.URL
 
-internal class UrlGenerator(
+internal data class UrlGenerator(
     val schema: String,
     val host: String,
     val port: Int?,
     val domainSuffix: String,
-    var symbol: String,
-    var schoolId: String,
+    val symbol: String,
+    val schoolId: String,
 ) {
 
     constructor(url: URL, domainSuffix: String, symbol: String, schoolId: String) : this(
