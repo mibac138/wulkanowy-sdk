@@ -97,17 +97,12 @@ class Sdk internal constructor(private val config: SdkConfig) {
         ADFSLightCufs,
     }
 
-    private val scrapper: Scrapper
-    private val hebe: Hebe
+    private val scrapper = config.createScrapperIfConfigured() ?: Scrapper()
+    private val hebe = config.createHebeIfConfigured() ?: Hebe()
 
     private val registerTimeZone = ZoneId.of("Europe/Warsaw")
 
     var mode = Mode.SCRAPPER
-
-    init {
-        hebe = config.createHebeIfConfigured() ?: Hebe()
-        scrapper = config.createScrapperIfConfigured() ?: Scrapper()
-    }
 
     val userAgent: String
         get() = scrapper.userAgent
