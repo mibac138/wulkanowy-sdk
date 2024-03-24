@@ -44,7 +44,7 @@ class HostsRemoteTest : BaseTest() {
     }
 
     private fun getScrapper(domain: String, startSymbol: String): Scrapper = Scrapper().apply {
-        logLevel = HttpLoggingInterceptor.Level.BASIC
+        setLogLevel(HttpLoggingInterceptor.Level.BASIC)
         loginType = Scrapper.LoginType.AUTO
         urlGenerator = UrlGenerator(schema = "https", host = domain, symbol = startSymbol)
         email = "jan@fakelog.cf"

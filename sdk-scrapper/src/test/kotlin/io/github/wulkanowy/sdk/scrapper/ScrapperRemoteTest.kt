@@ -24,7 +24,7 @@ class ScrapperRemoteTest : BaseTest() {
     @Before
     fun setUp() {
         api.apply {
-            logLevel = HttpLoggingInterceptor.Level.BASIC
+            setLogLevel(HttpLoggingInterceptor.Level.BASIC)
             loginType = Scrapper.LoginType.STANDARD
             urlGenerator = UrlGenerator(schema = "https", host = "fakelog.cf", symbol = "powiatwulkanowy", schoolId = "123456")
             email = "jan@fakelog.cf"

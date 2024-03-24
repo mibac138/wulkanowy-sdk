@@ -73,12 +73,6 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
 
     var isEduOne = false
 
-    var logLevel: HttpLoggingInterceptor.Level = HttpLoggingInterceptor.Level.BASIC
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
-
     var urlGenerator: UrlGenerator = UrlGenerator.Empty
         set(value) {
             if (field != value) changeManager.reset()
@@ -151,13 +145,23 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
             field = value
         }
 
+    fun setLogLevel(logLevel: HttpLoggingInterceptor.Level) {
+        logger = HttpLoggingInterceptor().setLevel(logLevel)
+    }
+
+    var logger: HttpLoggingInterceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)
+        set(value) {
+            if (field != value) changeManager.reset()
+            field = value
+        }
+
     private val appInterceptors: MutableList<Pair<Interceptor, Boolean>> = mutableListOf()
 
     fun addInterceptor(interceptor: Interceptor, network: Boolean = false) {
         appInterceptors.add(interceptor to network)
     }
 
-    private val okHttpFactory by resettableLazy(changeManager) { OkHttpClientBuilderFactory(urlGenerator.host) }
+    private val okHttpFactory by resettableLazy(changeManager) { OkHttpClientBuilderFactory(urlGenerator.host, logger) }
 
     private val headersByHost: MutableMap<String, ModuleHeaders> = mutableMapOf()
     private val loginLock = ReentrantLock(true)
@@ -165,7 +169,6 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
         ServiceManager(
             okHttpClientBuilderFactory = okHttpFactory,
             cookieJarCabinet = cookieJarCabinet,
-            logLevel = logLevel,
             loginType = loginType,
             urlGenerator = urlGenerator,
             email = email,

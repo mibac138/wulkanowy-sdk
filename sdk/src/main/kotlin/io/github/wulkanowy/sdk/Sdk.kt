@@ -141,13 +141,11 @@ class Sdk internal constructor(config: SdkConfig) {
             scrapper.emptyCookieJarInterceptor = it.emptyCookieJarInterceptor
             when (val logStyle = it.logStyle) {
                 is LogStyle.Level -> {
-                    scrapper.logLevel = logStyle.level
+                    scrapper.logger = HttpLoggingInterceptor().setLevel(logStyle.level)
                 }
 
                 is LogStyle.Custom -> {
-                    scrapper.logLevel = HttpLoggingInterceptor.Level.NONE
-                    val interceptor = HttpLoggingInterceptor(logStyle.logger).setLevel(HttpLoggingInterceptor.Level.BASIC)
-                    scrapper.addInterceptor(interceptor)
+                    scrapper.logger = HttpLoggingInterceptor(logStyle.logger).setLevel(HttpLoggingInterceptor.Level.BASIC)
                 }
             }
         } else {

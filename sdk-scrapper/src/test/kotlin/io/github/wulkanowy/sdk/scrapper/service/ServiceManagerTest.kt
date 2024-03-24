@@ -24,9 +24,8 @@ class ServiceManagerTest : BaseLocalTest() {
     @Test
     fun interceptorTest() {
         val manager = ServiceManager(
-            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost"),
+            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost", HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE)),
             cookieJarCabinet = CookieJarCabinet(),
-            logLevel = HttpLoggingInterceptor.Level.NONE,
             loginType = Scrapper.LoginType.STANDARD,
             urlGenerator = UrlGenerator(
                 schema = "http",
@@ -61,9 +60,8 @@ class ServiceManagerTest : BaseLocalTest() {
         server.enqueue(MockResponse().setBody(NotesTest::class.java.getResource("UwagiIOsiagniecia.json").readText()))
         server.start(3000)
         val manager = ServiceManager(
-            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost"),
+            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost", HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE)),
             cookieJarCabinet = CookieJarCabinet(),
-            logLevel = HttpLoggingInterceptor.Level.NONE,
             loginType = Scrapper.LoginType.STANDARD,
             urlGenerator = UrlGenerator(
                 schema = "http",
@@ -112,7 +110,7 @@ class ServiceManagerTest : BaseLocalTest() {
         server.start(3000)
 
         val api = Scrapper().apply {
-            logLevel = HttpLoggingInterceptor.Level.BASIC
+            setLogLevel(HttpLoggingInterceptor.Level.BASIC)
             urlGenerator = UrlGenerator(schema = "http", host = "fakelog.localhost", symbol = "Default", port = 3000, schoolId = "123456")
             email = "jan@fakelog.cf"
             password = "jan123"
@@ -134,9 +132,8 @@ class ServiceManagerTest : BaseLocalTest() {
         server.enqueue(MockResponse().setResponseCode(503))
         server.start(3000)
         val manager = ServiceManager(
-            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost"),
+            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost", HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE)),
             cookieJarCabinet = CookieJarCabinet(),
-            logLevel = HttpLoggingInterceptor.Level.NONE,
             loginType = Scrapper.LoginType.STANDARD,
             urlGenerator = UrlGenerator(
                 schema = "http",

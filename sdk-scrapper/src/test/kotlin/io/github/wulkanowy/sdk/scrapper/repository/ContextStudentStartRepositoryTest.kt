@@ -16,7 +16,7 @@ class ContextStudentStartRepositoryTest : BaseLocalTest() {
     private val api by lazy {
         Scrapper().apply {
             loginType = Scrapper.LoginType.STANDARD
-            logLevel = HttpLoggingInterceptor.Level.BODY
+            setLogLevel(HttpLoggingInterceptor.Level.BODY)
             urlGenerator = UrlGenerator(schema = "http", host = "fakelog.localhost", port = 3000, symbol = "Default", schoolId = "123456")
             email = "jan@fakelog.cf"
             password = "jan123"
