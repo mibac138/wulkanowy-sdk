@@ -125,7 +125,7 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
                 changeManager.reset()
                 cookieJarCabinet.onUserChange()
             }
-            field = value
+            field = if (value.isBlank()) "Default" else value.getNormalizedSymbol()
         }
 
     var email: String = ""
@@ -202,8 +202,6 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
 
     private val schema by resettableLazy(changeManager) { "http" + if (ssl) "s" else "" }
 
-    private val normalizedSymbol by resettableLazy(changeManager) { if (symbol.isBlank()) "Default" else symbol.getNormalizedSymbol() }
-
     private val okHttpFactory by resettableLazy(changeManager) { OkHttpClientBuilderFactory(host) }
 
     private val headersByHost: MutableMap<String, ModuleHeaders> = mutableMapOf()
@@ -214,7 +212,7 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
             cookieJarCabinet = cookieJarCabinet,
             logLevel = logLevel,
             loginType = loginType,
-            urlGenerator = UrlGenerator(schema = schema, host = host, port = port, domainSuffix = domainSuffix, symbol = normalizedSymbol, schoolId = schoolId),
+            urlGenerator = UrlGenerator(schema = schema, host = host, port = port, domainSuffix = domainSuffix, symbol = symbol, schoolId = schoolId),
             email = email,
             password = password,
             studentId = studentId,
@@ -238,7 +236,7 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
 
     private val register by resettableLazy(changeManager) {
         RegisterRepository(
-            startSymbol = normalizedSymbol,
+            startSymbol = symbol,
             email = email,
             password = password,
             loginHelperFactory = { urlGenerator ->
