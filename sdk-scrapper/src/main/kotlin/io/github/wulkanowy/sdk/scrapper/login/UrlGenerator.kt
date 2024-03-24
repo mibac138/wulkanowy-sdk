@@ -1,10 +1,7 @@
 package io.github.wulkanowy.sdk.scrapper.login
 
-import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator.Site.HOME
 import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator.Site.LOGIN
-import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator.Site.MESSAGES
 import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator.Site.STUDENT
-import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator.Site.STUDENT_PLUS
 import java.net.URL
 
 internal class UrlGenerator(
@@ -17,13 +14,12 @@ internal class UrlGenerator(
 
     constructor(url: URL, domainSuffix: String, symbol: String, schoolId: String) : this(url.protocol, url.host, domainSuffix, symbol, schoolId)
 
-    enum class Site {
-        LOGIN,
-        HOME,
-        STUDENT,
-        STUDENT_PLUS,
-        MESSAGES,
-        ;
+    enum class Site(internal val subDomain: String) {
+        LOGIN("cufs"),
+        HOME("uonetplus"),
+        STUDENT("uonetplus-uczen"),
+        STUDENT_PLUS("uonetplus-uczenplus"),
+        MESSAGES("uonetplus-wiadomosciplus");
 
         val isStudent: Boolean
             get() = this == STUDENT_PLUS || this == STUDENT
@@ -40,7 +36,7 @@ internal class UrlGenerator(
     }
 
     fun generateBase(type: Site): String {
-        return "$schema://${getSubDomain(type)}$domainSuffix.$host/"
+        return "$schema://${type.subDomain}$domainSuffix.$host/"
     }
 
     fun createReferer(type: Site): String {
@@ -48,16 +44,6 @@ internal class UrlGenerator(
             LOGIN -> "$schema://cufs$domainSuffix.$host/"
             STUDENT -> "$schema://uonetplus$domainSuffix.$host/"
             else -> ""
-        }
-    }
-
-    private fun getSubDomain(type: Site): String {
-        return when (type) {
-            LOGIN -> "cufs"
-            HOME -> "uonetplus"
-            STUDENT -> "uonetplus-uczen"
-            STUDENT_PLUS -> "uonetplus-uczenplus"
-            MESSAGES -> "uonetplus-wiadomosciplus"
         }
     }
 }

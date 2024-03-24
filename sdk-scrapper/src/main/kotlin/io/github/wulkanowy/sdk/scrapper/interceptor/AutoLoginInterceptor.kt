@@ -36,7 +36,7 @@ import java.net.HttpURLConnection
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
-private val HOSTS = arrayOf("uonetplus-wiadomosciplus", "uonetplus-uczenplus", "uonetplus-uczen")
+private val HOSTS = arrayOf(UrlGenerator.Site.MESSAGES.subDomain, UrlGenerator.Site.STUDENT_PLUS.subDomain, UrlGenerator.Site.STUDENT.subDomain)
 
 internal data class ModuleHeaders(
     val token: String,
