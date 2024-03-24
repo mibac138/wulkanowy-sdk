@@ -3,7 +3,6 @@ package io.github.wulkanowy.sdk.scrapper.service
 import io.github.wulkanowy.sdk.scrapper.CookieJarCabinet
 import io.github.wulkanowy.sdk.scrapper.OkHttpClientBuilderFactory
 import io.github.wulkanowy.sdk.scrapper.Scrapper
-import io.github.wulkanowy.sdk.scrapper.TLSSocketFactory
 import io.github.wulkanowy.sdk.scrapper.adapter.ObjectSerializer
 import io.github.wulkanowy.sdk.scrapper.exception.ScrapperException
 import io.github.wulkanowy.sdk.scrapper.interceptor.AutoLoginInterceptor
@@ -31,23 +30,19 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.create
-import java.security.KeyStore
 import java.time.LocalDate
-import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.locks.ReentrantLock
-import javax.net.ssl.TrustManagerFactory
-import javax.net.ssl.X509TrustManager
 
 internal class ServiceManager(
     private val okHttpClientBuilderFactory: OkHttpClientBuilderFactory,
     private val cookieJarCabinet: CookieJarCabinet,
     logLevel: HttpLoggingInterceptor.Level,
-    private val loginType: Scrapper.LoginType,
-    private val schema: String,
-    private val host: String,
-    private val port: Int?,
-    private val domainSuffix: String,
-    private val symbol: String,
+    loginType: Scrapper.LoginType,
+    schema: String,
+    host: String,
+    port: Int?,
+    domainSuffix: String,
+    symbol: String,
     private val email: String,
     private val password: String,
     private val schoolId: String,
@@ -114,19 +109,6 @@ internal class ServiceManager(
         HttpErrorInterceptor() to false,
     )
 
-    private val trustManager: X509TrustManager by lazy {
-        val trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm())
-        trustManagerFactory.init(null as? KeyStore?)
-        val trustManagers = trustManagerFactory.trustManagers
-        if (trustManagers.size != 1 || trustManagers[0] !is X509TrustManager) {
-            throw IllegalStateException("Unexpected default trust managers: $trustManagers")
-        }
-        trustManagers[0] as X509TrustManager
-    }
-
-    companion object {
-        private const val TIMEOUT_IN_SECONDS = 30L
-    }
 
     fun setInterceptor(interceptor: Interceptor, network: Boolean = false) {
         interceptors.add(0, interceptor to network)
@@ -232,19 +214,6 @@ internal class ServiceManager(
         loginIntercept: Boolean = true,
         separateJar: Boolean = false,
     ) = okHttpClientBuilderFactory.create()
-        .connectTimeout(TIMEOUT_IN_SECONDS, SECONDS)
-        .callTimeout(TIMEOUT_IN_SECONDS, SECONDS)
-        .writeTimeout(TIMEOUT_IN_SECONDS, SECONDS)
-        .readTimeout(TIMEOUT_IN_SECONDS, SECONDS)
-        .apply {
-            when (host) {
-                "edu.gdansk.pl",
-                "edu.lublin.eu",
-                "eduportal.koszalin.pl",
-                "vulcan.net.pl",
-                -> sslSocketFactory(TLSSocketFactory(), trustManager)
-            }
-        }
         .cookieJar(
             when {
                 separateJar -> JavaNetCookieJar(cookieJarCabinet.alternativeCookieManager)

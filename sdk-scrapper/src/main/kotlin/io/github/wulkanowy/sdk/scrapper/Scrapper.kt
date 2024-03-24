@@ -203,7 +203,7 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
 
     private val normalizedSymbol by resettableLazy(changeManager) { if (symbol.isBlank()) "Default" else symbol.getNormalizedSymbol() }
 
-    private val okHttpFactory by lazy { OkHttpClientBuilderFactory() }
+    private val okHttpFactory by resettableLazy(changeManager) { OkHttpClientBuilderFactory(host) }
 
     private val headersByHost: MutableMap<String, ModuleHeaders> = mutableMapOf()
     private val loginLock = ReentrantLock(true)

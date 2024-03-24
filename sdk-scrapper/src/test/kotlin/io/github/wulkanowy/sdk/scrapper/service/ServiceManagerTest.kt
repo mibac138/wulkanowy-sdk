@@ -23,7 +23,7 @@ class ServiceManagerTest : BaseLocalTest() {
     @Test
     fun interceptorTest() {
         val manager = ServiceManager(
-            okHttpClientBuilderFactory = OkHttpClientBuilderFactory(),
+            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost"),
             cookieJarCabinet = CookieJarCabinet(),
             logLevel = HttpLoggingInterceptor.Level.NONE,
             loginType = Scrapper.LoginType.STANDARD,
@@ -58,7 +58,7 @@ class ServiceManagerTest : BaseLocalTest() {
         server.enqueue(MockResponse().setBody(NotesTest::class.java.getResource("UwagiIOsiagniecia.json").readText()))
         server.start(3000)
         val manager = ServiceManager(
-            okHttpClientBuilderFactory = OkHttpClientBuilderFactory(),
+            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost"),
             cookieJarCabinet = CookieJarCabinet(),
             logLevel = HttpLoggingInterceptor.Level.NONE,
             loginType = Scrapper.LoginType.STANDARD,
@@ -132,7 +132,7 @@ class ServiceManagerTest : BaseLocalTest() {
         server.enqueue(MockResponse().setResponseCode(503))
         server.start(3000)
         val manager = ServiceManager(
-            okHttpClientBuilderFactory = OkHttpClientBuilderFactory(),
+            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost"),
             cookieJarCabinet = CookieJarCabinet(),
             logLevel = HttpLoggingInterceptor.Level.NONE,
             loginType = Scrapper.LoginType.STANDARD,
