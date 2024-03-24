@@ -15,11 +15,12 @@ import retrofit2.create
 
 internal class RepositoryManager(
     private val httpClient: OkHttpClient,
-    private val keyId: String,
-    private val privatePem: String,
+    keyId: String,
+    privatePem: String,
 ) {
 
     private val interceptors: MutableList<Pair<Interceptor, Boolean>> = mutableListOf(
+        SignInterceptor(keyId, privatePem) to false,
         ErrorInterceptor() to false,
     )
 
@@ -36,18 +37,12 @@ internal class RepositoryManager(
 
     fun getRoutesRepository(): RoutingRulesRepository {
         return RoutingRulesRepository(
-            getRetrofitBuilder(isJson = false, signInterceptor = false)
-                .baseUrl("https://komponenty.vulcan.net.pl")
-                .build()
-                .create(),
+            getRetrofitBuilder(getClientBuilder(signInterceptor = false), baseUrl = "https://komponenty.vulcan.net.pl", json = false).create(),
         )
     }
 
     fun getStudentRepository(baseUrl: String, schoolId: String): StudentRepository = StudentRepository(
-        getRetrofitBuilder(isJson = true, signInterceptor = true)
-            .baseUrl("${baseUrl.removeSuffix("/")}/$schoolId/")
-            .build()
-            .create(),
+        getRetrofitBuilder(getClientBuilder(), "${baseUrl.removeSuffix("/")}/$schoolId/").create(),
     )
 
     internal fun getRegisterRepository(baseUrl: String, symbol: String = ""): RegisterRepository = getRegisterRepository(
@@ -55,29 +50,31 @@ internal class RepositoryManager(
     )
 
     private fun getRegisterRepository(baseUrl: String): RegisterRepository = RegisterRepository(
-        getRetrofitBuilder(signInterceptor = true)
-            .baseUrl("${baseUrl.removeSuffix("/")}/api/mobile/register/")
-            .build()
-            .create(),
+        getRetrofitBuilder(getClientBuilder(), "${baseUrl.removeSuffix("/")}/api/mobile/register/").create(),
     )
 
-    private fun getRetrofitBuilder(isJson: Boolean = true, signInterceptor: Boolean): Retrofit.Builder {
-        return Retrofit.Builder()
-            .apply {
-                when {
-                    isJson -> addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
-                    else -> addConverterFactory(ScalarsConverterFactory.create())
+    private fun getRetrofitBuilder(client: OkHttpClient, baseUrl: String, json: Boolean = true) = Retrofit.Builder()
+        .baseUrl(baseUrl)
+        .addConverterFactory(
+            when {
+                json -> this.json.asConverterFactory("application/json".toMediaType())
+                else -> ScalarsConverterFactory.create()
+            },
+        )
+        .client(client)
+        .build()
+
+    private fun getClientBuilder(
+        signInterceptor: Boolean = true,
+    ) = httpClient.newBuilder()
+        .apply {
+            interceptors.forEach { (interceptor, network) ->
+                when (interceptor) {
+                    is SignInterceptor -> if (signInterceptor) addInterceptor(interceptor, network)
+                    else -> addInterceptor(interceptor, network)
                 }
             }
-            .client(
-                httpClient.newBuilder().apply {
-                        if (signInterceptor) {
-                            addInterceptor(SignInterceptor(keyId, privatePem))
-                        }
-                    interceptors.forEach { (interceptor, network) ->
-                        addInterceptor(interceptor, network)
-                        }
-                }.build(),
-            )
-    }
+        }
+        .build()
+
 }
