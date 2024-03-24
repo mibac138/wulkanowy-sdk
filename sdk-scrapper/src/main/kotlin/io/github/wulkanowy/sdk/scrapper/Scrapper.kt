@@ -1,12 +1,12 @@
 package io.github.wulkanowy.sdk.scrapper
 
+import io.github.wulkanowy.sdk.common.exception.UnavailableFeatureException
 import io.github.wulkanowy.sdk.scrapper.attendance.Absent
 import io.github.wulkanowy.sdk.scrapper.attendance.Attendance
 import io.github.wulkanowy.sdk.scrapper.attendance.AttendanceSummary
 import io.github.wulkanowy.sdk.scrapper.attendance.Subject
 import io.github.wulkanowy.sdk.scrapper.conferences.Conference
 import io.github.wulkanowy.sdk.scrapper.exams.Exam
-import io.github.wulkanowy.sdk.scrapper.exception.FeatureUnavailableException
 import io.github.wulkanowy.sdk.scrapper.exception.ScrapperException
 import io.github.wulkanowy.sdk.scrapper.grades.GradePointsSummary
 import io.github.wulkanowy.sdk.scrapper.grades.Grades
@@ -259,7 +259,7 @@ class Scrapper(
         if (diaryId == 0) return emptyList()
 
         return when (isEduOne) {
-            true -> throw FeatureUnavailableException()
+            true -> throw UnavailableFeatureException()
             else -> student.getGradesPartialStatistics(semesterId)
         }
     }
@@ -268,7 +268,7 @@ class Scrapper(
         if (diaryId == 0) return emptyList()
 
         return when (isEduOne) {
-            true -> throw FeatureUnavailableException()
+            true -> throw UnavailableFeatureException()
             else -> student.getGradesPointsStatistics(semesterId)
         }
     }
@@ -277,7 +277,7 @@ class Scrapper(
         if (diaryId == 0) return emptyList()
 
         return when (isEduOne) {
-            true -> throw FeatureUnavailableException()
+            true -> throw UnavailableFeatureException()
             else -> student.getGradesAnnualStatistics(semesterId)
         }
     }

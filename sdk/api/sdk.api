@@ -183,9 +183,6 @@ public final class io/github/wulkanowy/sdk/UtilsKt {
 	public static final fun toLocalDateTime (Ljava/lang/String;Ljava/lang/String;)Ljava/time/LocalDateTime;
 }
 
-public final class io/github/wulkanowy/sdk/exception/FeatureNotAvailableException : java/io/IOException {
-}
-
 public final class io/github/wulkanowy/sdk/exception/VulcanException : java/io/IOException {
 }
 

@@ -5,6 +5,8 @@ plugins {
 }
 
 dependencies {
+    implementation project(":sdk-common")
+
     implementation "pl.droidsonroids:jspoon:$jspoon"
     implementation "org.jsoup:jsoup:$jsoup"
 
