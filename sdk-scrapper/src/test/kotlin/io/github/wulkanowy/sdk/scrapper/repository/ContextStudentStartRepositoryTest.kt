@@ -7,6 +7,7 @@ import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator
 import io.github.wulkanowy.sdk.scrapper.messages.MessagesTest
 import io.github.wulkanowy.sdk.scrapper.register.RegisterTest
 import kotlinx.coroutines.runBlocking
+import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -14,9 +15,8 @@ import org.junit.Test
 class ContextStudentStartRepositoryTest : BaseLocalTest() {
 
     private val api by lazy {
-        Scrapper().apply {
+        Scrapper(httpClient = OkHttpClient().newBuilder().addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)).build()).apply {
             loginType = Scrapper.LoginType.STANDARD
-            setLogLevel(HttpLoggingInterceptor.Level.BODY)
             urlGenerator = UrlGenerator(schema = "http", host = "fakelog.localhost", port = 3000, symbol = "Default", schoolId = "123456")
             email = "jan@fakelog.cf"
             password = "jan123"

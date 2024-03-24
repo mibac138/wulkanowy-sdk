@@ -73,6 +73,7 @@ import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Interceptor
+import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.net.CookieManager
 import java.net.URL
@@ -126,7 +127,9 @@ class Sdk internal constructor(config: SdkConfig) {
         }
         if (config.scrapperConfig != null) {
             val it = config.scrapperConfig!!
-            scrapper = Scrapper(userAgent = it.userAgent)
+            val loggingInterceptor = it.logStyle.toLoggingInterceptor()
+            val httpClient = OkHttpClient().newBuilder().addNetworkInterceptor(loggingInterceptor).build()
+            scrapper = Scrapper(userAgent = it.userAgent, httpClient = httpClient)
             scrapper.urlGenerator = UrlGenerator(url = URL(it.baseUrl), domainSuffix = it.domainSuffix, schoolId = config.schoolSymbol!!, symbol = it.symbol)
             scrapper.isEduOne = it.isEduOne
             scrapper.email = it.email
@@ -139,15 +142,6 @@ class Sdk internal constructor(config: SdkConfig) {
             scrapper.schoolYear = it.schoolYear
             scrapper.loginType = it.loginType
             scrapper.emptyCookieJarInterceptor = it.emptyCookieJarInterceptor
-            when (val logStyle = it.logStyle) {
-                is LogStyle.Level -> {
-                    scrapper.logger = HttpLoggingInterceptor().setLevel(logStyle.level)
-                }
-
-                is LogStyle.Custom -> {
-                    scrapper.logger = HttpLoggingInterceptor(logStyle.logger).setLevel(HttpLoggingInterceptor.Level.BASIC)
-                }
-            }
         } else {
             scrapper = Scrapper()
         }
@@ -601,6 +595,16 @@ class Sdk internal constructor(config: SdkConfig) {
 sealed class LogStyle {
     class Level(val level: HttpLoggingInterceptor.Level) : LogStyle()
     class Custom(internal val logger: (String) -> Unit) : LogStyle()
+
+    internal fun toLoggingInterceptor(): HttpLoggingInterceptor = when (this) {
+        is Level -> {
+            HttpLoggingInterceptor().setLevel(level)
+        }
+
+        is Custom -> {
+            HttpLoggingInterceptor(logger).setLevel(HttpLoggingInterceptor.Level.BASIC)
+        }
+    }
 }
 
 sealed class CommonSdkConfig {

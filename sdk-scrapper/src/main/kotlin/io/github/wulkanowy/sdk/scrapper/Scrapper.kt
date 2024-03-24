@@ -49,12 +49,18 @@ import io.github.wulkanowy.sdk.scrapper.student.StudentPhoto
 import io.github.wulkanowy.sdk.scrapper.timetable.CompletedLesson
 import io.github.wulkanowy.sdk.scrapper.timetable.Timetable
 import okhttp3.Interceptor
+import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.net.CookieManager
 import java.time.LocalDate
 import java.util.concurrent.locks.ReentrantLock
 
-class Scrapper(val userAgent: String = androidUserAgentString()) {
+private val httpClientWithBasicLogging = OkHttpClient().newBuilder().addNetworkInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)).build()
+
+class Scrapper(
+    val userAgent: String = androidUserAgentString(),
+    httpClient: OkHttpClient = httpClientWithBasicLogging,
+) {
 
     // TODO: refactor
     enum class LoginType {
@@ -145,23 +151,13 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
             field = value
         }
 
-    fun setLogLevel(logLevel: HttpLoggingInterceptor.Level) {
-        logger = HttpLoggingInterceptor().setLevel(logLevel)
-    }
-
-    var logger: HttpLoggingInterceptor = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
-
     private val appInterceptors: MutableList<Pair<Interceptor, Boolean>> = mutableListOf()
 
     fun addInterceptor(interceptor: Interceptor, network: Boolean = false) {
         appInterceptors.add(interceptor to network)
     }
 
-    private val okHttpFactory by resettableLazy(changeManager) { OkHttpClientBuilderFactory(urlGenerator.host, logger) }
+    private val okHttpFactory by resettableLazy(changeManager) { OkHttpClientBuilderFactory(host = urlGenerator.host, base = httpClient) }
 
     private val headersByHost: MutableMap<String, ModuleHeaders> = mutableMapOf()
     private val loginLock = ReentrantLock(true)

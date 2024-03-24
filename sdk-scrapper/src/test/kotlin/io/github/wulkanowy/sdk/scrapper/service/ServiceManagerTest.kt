@@ -11,7 +11,6 @@ import io.github.wulkanowy.sdk.scrapper.login.LoginTest
 import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator
 import io.github.wulkanowy.sdk.scrapper.notes.NotesTest
 import kotlinx.coroutines.runBlocking
-import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.mockwebserver.MockResponse
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -24,7 +23,7 @@ class ServiceManagerTest : BaseLocalTest() {
     @Test
     fun interceptorTest() {
         val manager = ServiceManager(
-            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost", HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE)),
+            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost"),
             cookieJarCabinet = CookieJarCabinet(),
             loginType = Scrapper.LoginType.STANDARD,
             urlGenerator = UrlGenerator(
@@ -60,7 +59,7 @@ class ServiceManagerTest : BaseLocalTest() {
         server.enqueue(MockResponse().setBody(NotesTest::class.java.getResource("UwagiIOsiagniecia.json").readText()))
         server.start(3000)
         val manager = ServiceManager(
-            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost", HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE)),
+            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost"),
             cookieJarCabinet = CookieJarCabinet(),
             loginType = Scrapper.LoginType.STANDARD,
             urlGenerator = UrlGenerator(
@@ -110,7 +109,6 @@ class ServiceManagerTest : BaseLocalTest() {
         server.start(3000)
 
         val api = Scrapper().apply {
-            setLogLevel(HttpLoggingInterceptor.Level.BASIC)
             urlGenerator = UrlGenerator(schema = "http", host = "fakelog.localhost", symbol = "Default", port = 3000, schoolId = "123456")
             email = "jan@fakelog.cf"
             password = "jan123"
@@ -132,7 +130,7 @@ class ServiceManagerTest : BaseLocalTest() {
         server.enqueue(MockResponse().setResponseCode(503))
         server.start(3000)
         val manager = ServiceManager(
-            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost", HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE)),
+            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost"),
             cookieJarCabinet = CookieJarCabinet(),
             loginType = Scrapper.LoginType.STANDARD,
             urlGenerator = UrlGenerator(

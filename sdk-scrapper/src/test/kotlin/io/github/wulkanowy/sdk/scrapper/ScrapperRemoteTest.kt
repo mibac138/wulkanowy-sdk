@@ -6,7 +6,6 @@ import io.github.wulkanowy.sdk.scrapper.messages.Folder
 import io.github.wulkanowy.sdk.scrapper.register.RegisterStudent
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
-import okhttp3.logging.HttpLoggingInterceptor
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -24,7 +23,6 @@ class ScrapperRemoteTest : BaseTest() {
     @Before
     fun setUp() {
         api.apply {
-            setLogLevel(HttpLoggingInterceptor.Level.BASIC)
             loginType = Scrapper.LoginType.STANDARD
             urlGenerator = UrlGenerator(schema = "https", host = "fakelog.cf", symbol = "powiatwulkanowy", schoolId = "123456")
             email = "jan@fakelog.cf"

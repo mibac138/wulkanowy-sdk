@@ -1,7 +1,6 @@
 package io.github.wulkanowy.sdk.scrapper
 
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import java.security.KeyStore
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.TrustManagerFactory
@@ -9,10 +8,13 @@ import javax.net.ssl.X509TrustManager
 
 private const val TIMEOUT_IN_SECONDS = 30L
 
-internal class OkHttpClientBuilderFactory(host: String, logger: HttpLoggingInterceptor) {
+internal class OkHttpClientBuilderFactory(
+    host: String,
+    base: OkHttpClient = OkHttpClient(),
+) {
 
     private val okHttpClient by lazy {
-        OkHttpClient().newBuilder()
+        base.newBuilder()
             .connectTimeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
             .callTimeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
             .writeTimeout(TIMEOUT_IN_SECONDS, TimeUnit.SECONDS)
@@ -28,7 +30,6 @@ internal class OkHttpClientBuilderFactory(host: String, logger: HttpLoggingInter
                     }
                 }
             }
-            .addNetworkInterceptor(logger)
             .build()
     }
 

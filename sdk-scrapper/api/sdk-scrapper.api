@@ -1,7 +1,7 @@
 public final class io/github/wulkanowy/sdk/scrapper/Scrapper {
 	public fun <init> ()V
-	public fun <init> (Ljava/lang/String;)V
-	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/lang/String;Lokhttp3/OkHttpClient;)V
+	public synthetic fun <init> (Ljava/lang/String;Lokhttp3/OkHttpClient;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun addInterceptor (Lokhttp3/Interceptor;Z)V
 	public static synthetic fun addInterceptor$default (Lio/github/wulkanowy/sdk/scrapper/Scrapper;Lokhttp3/Interceptor;ZILjava/lang/Object;)V
 	public final fun authorizePermission (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -40,7 +40,6 @@ public final class io/github/wulkanowy/sdk/scrapper/Scrapper {
 	public final fun getLastHomework (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getLastStudentLessons (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getLastTests (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun getLogLevel ()Lokhttp3/logging/HttpLoggingInterceptor$Level;
 	public final fun getLoginType ()Lio/github/wulkanowy/sdk/scrapper/Scrapper$LoginType;
 	public final fun getMailboxes (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getMenu (Ljava/time/LocalDate;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -87,7 +86,6 @@ public final class io/github/wulkanowy/sdk/scrapper/Scrapper {
 	public final fun setEmail (Ljava/lang/String;)V
 	public final fun setEmptyCookieJarInterceptor (Z)V
 	public final fun setKindergartenDiaryId (I)V
-	public final fun setLogLevel (Lokhttp3/logging/HttpLoggingInterceptor$Level;)V
 	public final fun setLoginType (Lio/github/wulkanowy/sdk/scrapper/Scrapper$LoginType;)V
 	public final fun setPassword (Ljava/lang/String;)V
 	public final fun setSchoolYear (I)V
