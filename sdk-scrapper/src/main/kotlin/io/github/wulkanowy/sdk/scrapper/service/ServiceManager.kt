@@ -91,7 +91,6 @@ internal class ServiceManager(
         HttpErrorInterceptor() to false,
     )
 
-
     fun setInterceptor(interceptor: Interceptor, network: Boolean = false) {
         interceptors.add(0, interceptor to network)
     }
@@ -143,28 +142,28 @@ internal class ServiceManager(
         ).create()
     }
 
-    private fun prepareStudentHttpClient(withLogin: Boolean, studentInterceptor: Boolean): OkHttpClient.Builder {
+    private fun prepareStudentHttpClient(withLogin: Boolean, studentInterceptor: Boolean): OkHttpClient {
         if (withLogin && urlGenerator.schoolId.isBlank()) throw ScrapperException("School id is not set")
 
-        val client = getClientBuilder(loginIntercept = withLogin)
-        if (studentInterceptor) {
-            if ((0 == diaryId && 0 == kindergartenDiaryId) || 0 == studentId) throw ScrapperException("Student or/and diaryId id are not set")
+        return getClientBuilder(loginIntercept = withLogin) {
+            if (studentInterceptor) {
+                if ((0 == diaryId && 0 == kindergartenDiaryId) || 0 == studentId) throw ScrapperException("Student or/and diaryId id are not set")
 
-            client.addInterceptor(
-                StudentCookieInterceptor(
-                    cookieStore = cookieJarCabinet.userCookieManager.cookieStore,
-                    urlGenerator = urlGenerator,
-                    diaryId = diaryId,
-                    kindergartenDiaryId = kindergartenDiaryId,
-                    studentId = studentId,
-                    schoolYear = when (schoolYear) {
-                        0 -> if (LocalDate.now().monthValue < 9) LocalDate.now().year - 1 else LocalDate.now().year // fallback
-                        else -> schoolYear
-                    },
-                ),
-            )
+                addInterceptor(
+                    StudentCookieInterceptor(
+                        cookieStore = cookieJarCabinet.userCookieManager.cookieStore,
+                        urlGenerator = urlGenerator,
+                        diaryId = diaryId,
+                        kindergartenDiaryId = kindergartenDiaryId,
+                        studentId = studentId,
+                        schoolYear = when (schoolYear) {
+                            0 -> if (LocalDate.now().monthValue < 9) LocalDate.now().year - 1 else LocalDate.now().year // fallback
+                            else -> schoolYear
+                        },
+                    ),
+                )
+            }
         }
-        return client
     }
 
     fun getMessagesService(withLogin: Boolean = true): MessagesService {
@@ -179,9 +178,9 @@ internal class ServiceManager(
         return getRetrofit(getClientBuilder(), urlGenerator.generateWithSymbol(UrlGenerator.Site.HOME), json = true).create()
     }
 
-    private fun getRetrofit(client: OkHttpClient.Builder, baseUrl: String, json: Boolean = false) = Retrofit.Builder()
+    private fun getRetrofit(client: OkHttpClient, baseUrl: String, json: Boolean = false) = Retrofit.Builder()
         .baseUrl(baseUrl)
-        .client(client.build())
+        .client(client)
         .addConverterFactory(ScalarsConverterFactory.create())
         .addConverterFactory(
             when {
@@ -195,6 +194,7 @@ internal class ServiceManager(
         errIntercept: Boolean = true,
         loginIntercept: Boolean = true,
         separateJar: Boolean = false,
+        block: OkHttpClient.Builder.() -> Unit = {},
     ) = okHttpClientBuilderFactory.create()
         .cookieJar(
             when {
@@ -211,6 +211,8 @@ internal class ServiceManager(
                 }
             }
         }
+        .also(block)
+        .build()
 }
 
 private fun OkHttpClient.Builder.addInterceptor(interceptor: Interceptor, network: Boolean) = if (network) addNetworkInterceptor(interceptor) else addInterceptor(interceptor)
