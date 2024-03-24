@@ -1,11 +1,11 @@
 package io.github.wulkanowy.sdk.scrapper.repository
 
 import io.github.wulkanowy.sdk.scrapper.getScriptParam
+import io.github.wulkanowy.sdk.scrapper.handleErrors
 import io.github.wulkanowy.sdk.scrapper.home.DirectorInformation
 import io.github.wulkanowy.sdk.scrapper.home.GovernmentUnit
 import io.github.wulkanowy.sdk.scrapper.home.LastAnnouncement
 import io.github.wulkanowy.sdk.scrapper.home.LuckyNumber
-import io.github.wulkanowy.sdk.scrapper.interceptor.handleErrors
 import io.github.wulkanowy.sdk.scrapper.service.HomepageService
 import io.github.wulkanowy.sdk.scrapper.toLocalDate
 import kotlinx.coroutines.sync.Mutex
