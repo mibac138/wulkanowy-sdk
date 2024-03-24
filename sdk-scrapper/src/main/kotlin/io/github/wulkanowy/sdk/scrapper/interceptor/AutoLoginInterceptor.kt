@@ -49,7 +49,7 @@ internal class AutoLoginInterceptor(
     private val headersByHost: MutableMap<String, ModuleHeaders> = mutableMapOf(),
     private val loginLock: ReentrantLock = ReentrantLock(true),
     private val notLoggedInCallback: suspend () -> LoginResult,
-    private val fetchModuleCookies: (UrlGenerator.Site) -> Pair<HttpUrl, Document>,
+    private val fetchModuleCookies: suspend (UrlGenerator.Site) -> Pair<HttpUrl, Document>,
 ) : Interceptor {
 
     companion object {
@@ -88,10 +88,12 @@ internal class AutoLoginInterceptor(
                     val loginResult = runBlocking { notLoggedInCallback() }
                     headersByHost.clear()
 
-                    val messages = getModuleCookies(UrlGenerator.Site.MESSAGES)
-                    val student = when (loginResult.isStudentSchoolUseEduOne) {
-                        true -> getModuleCookies(UrlGenerator.Site.STUDENT_PLUS)
-                        else -> getModuleCookies(UrlGenerator.Site.STUDENT)
+                    val messages = runBlocking { getModuleCookies(UrlGenerator.Site.MESSAGES) }
+                    val student = runBlocking {
+                        when (loginResult.isStudentSchoolUseEduOne) {
+                            true -> getModuleCookies(UrlGenerator.Site.STUDENT_PLUS)
+                            else -> getModuleCookies(UrlGenerator.Site.STUDENT)
+                        }
                     }
 
                     when {
@@ -134,7 +136,7 @@ internal class AutoLoginInterceptor(
         }
     }
 
-    private fun getModuleCookies(site: UrlGenerator.Site): Result<Pair<HttpUrl, Document>?> {
+    private suspend fun getModuleCookies(site: UrlGenerator.Site): Result<Pair<HttpUrl, Document>?> {
         return runCatching { fetchModuleCookies(site) }
             .onFailure { logger.error("Error in $site login", it) }
             .onSuccess { (url, doc) -> saveModuleHeaders(doc, url) }

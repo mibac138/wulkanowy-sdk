@@ -89,9 +89,9 @@ internal class LoginHelper(
         )
     }
 
-    fun loginModule(site: UrlGenerator.Site): Pair<HttpUrl, Document> {
+    suspend fun loginModule(site: UrlGenerator.Site): Pair<HttpUrl, Document> {
         val moduleUrl = urlGenerator.generateWithSymbol(site) + "LoginEndpoint.aspx"
-        val startHtml = api.getModuleStart(moduleUrl).execute().handleErrors().body().orEmpty()
+        val startHtml = api.getModuleStart(moduleUrl).handleErrors().body().orEmpty()
         val startDoc = Jsoup.parse(startHtml)
 
         if ("Working" in startDoc.title()) {
@@ -104,7 +104,7 @@ internal class LoginHelper(
                     "wresult" to cert.wresult,
                     "wctx" to cert.wctx,
                 ),
-            ).execute().handleErrors().body().orEmpty()
+            ).handleErrors().body().orEmpty()
             val certResponseDoc = Jsoup.parse(certResponseHtml)
             if ("antiForgeryToken" !in certResponseHtml) {
                 throw IOException("Unknown module start page: ${certResponseDoc.title()}")

@@ -2,7 +2,7 @@ package io.github.wulkanowy.sdk.scrapper.service
 
 import io.github.wulkanowy.sdk.scrapper.login.ADFSFormResponse
 import io.github.wulkanowy.sdk.scrapper.register.HomePageResponse
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.FieldMap
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -27,11 +27,11 @@ internal interface LoginService {
     suspend fun sendCertificate(@Header("Referer") referer: String, @Url url: String, @FieldMap certificate: Map<String, String>): HomePageResponse
 
     @GET
-    fun getModuleStart(@Url url: String): Call<String>
+    suspend fun getModuleStart(@Url url: String): Response<String>
 
     @POST
     @FormUrlEncoded
-    fun sendCertificateModule(@Header("Referer") referer: String, @Url url: String, @FieldMap certificate: Map<String, String>): Call<String>
+    suspend fun sendCertificateModule(@Header("Referer") referer: String, @Url url: String, @FieldMap certificate: Map<String, String>): Response<String>
 
     @GET
     suspend fun switchLogin(@Url url: String): HomePageResponse
