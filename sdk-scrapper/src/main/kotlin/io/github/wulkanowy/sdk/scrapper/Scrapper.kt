@@ -83,7 +83,9 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
         set(value) {
             field = value
             ssl = baseUrl.startsWith("https")
-            host = URL(value).let { "${it.host}:${it.port}".removeSuffix(":-1") }
+            val url = URL(value)
+            host = url.host
+            port = url.port.takeUnless { it == -1 }
         }
 
     var ssl: Boolean = true
@@ -93,6 +95,12 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
         }
 
     var host: String = "fakelog.cf"
+        set(value) {
+            if (field != value) changeManager.reset()
+            field = value
+        }
+
+    var port: Int? = null
         set(value) {
             if (field != value) changeManager.reset()
             field = value
@@ -207,6 +215,7 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
             loginType = loginType,
             schema = schema,
             host = host,
+            port = port,
             domainSuffix = domainSuffix,
             symbol = normalizedSymbol,
             email = email,
@@ -238,10 +247,6 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
             password = password,
             loginHelper = LoginHelper(
                 loginType = loginType,
-                schema = schema,
-                host = host,
-                domainSuffix = domainSuffix,
-                symbol = normalizedSymbol,
                 cookieJarCabinet = cookieJarCabinet,
                 api = serviceManager.getLoginService(),
                 urlGenerator = serviceManager.urlGenerator,

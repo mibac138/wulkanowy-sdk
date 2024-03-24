@@ -32,13 +32,9 @@ class RegisterRepositoryTest : BaseLocalTest() {
             password = "jan123",
             loginHelper = LoginHelper(
                 loginType = Scrapper.LoginType.STANDARD,
-                schema = "http",
-                host = "fakelog.localhost:3000",
-                domainSuffix = "",
-                symbol = symbol,
                 cookieJarCabinet = CookieJarCabinet(),
                 api = getService(LoginService::class.java, "http://fakelog.localhost:3000/"),
-                urlGenerator = UrlGenerator(URL("http://localhost/"), "", "Default", ""),
+                urlGenerator = UrlGenerator(URL("http://fakelog.localhost:3000/"), "", symbol, ""),
             ),
             register = getService(
                 service = RegisterService::class.java,
@@ -58,7 +54,8 @@ class RegisterRepositoryTest : BaseLocalTest() {
             ),
             url = UrlGenerator(
                 schema = "http",
-                host = "fakelog.localhost:3000",
+                host = "fakelog.localhost",
+                port = 3000,
                 domainSuffix = "",
                 symbol = symbol,
                 schoolId = "",
@@ -399,8 +396,8 @@ class RegisterRepositoryTest : BaseLocalTest() {
         assertEquals("/powiatwulkanowy/Account/LogOn", server.takeRequest().path)
 
         val url = server.takeRequest().path
-        assertEquals(true, url?.startsWith("/Default/Account/LogOn?ReturnUrl=%2FDefault"))
-        assertEquals("/Default/LoginEndpoint.aspx", server.takeRequest().path)
+        assertEquals(true, url?.startsWith("/powiatwulkanowy/Account/LogOn?ReturnUrl=%2Fpowiatwulkanowy"))
+        assertEquals("/Default/LoginEndpoint.aspx", server.takeRequest().path) // no longer powiatwulkanowy because the server returns a symbol of Default
         server.takeRequest()
         server.takeRequest()
         server.takeRequest()

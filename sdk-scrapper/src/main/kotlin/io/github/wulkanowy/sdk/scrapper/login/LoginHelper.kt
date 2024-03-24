@@ -33,14 +33,22 @@ import java.util.Locale
 
 internal class LoginHelper(
     var loginType: Scrapper.LoginType,
-    private val schema: String,
-    private val host: String,
-    private val domainSuffix: String,
-    private val symbol: String,
     private val cookieJarCabinet: CookieJarCabinet,
     private val api: LoginService,
     private val urlGenerator: UrlGenerator,
 ) {
+
+    private val schema: String
+        get() = urlGenerator.schema
+
+    private val host: String
+        get() = urlGenerator.host + urlGenerator.port?.let { ":$it" }.orEmpty()
+
+    private val symbol: String
+        get() = urlGenerator.symbol
+
+    private val domainSuffix: String
+        get() = urlGenerator.domainSuffix
 
     companion object {
         @JvmStatic
@@ -177,7 +185,6 @@ internal class LoginHelper(
 
     @Suppress("DuplicatedCode")
     private suspend fun sendStandard(email: String, password: String): CertificateResponse {
-        val symbol = urlGenerator.symbol
         val targetRealm = encode("$schema://uonetplus$domainSuffix.$host/$symbol/LoginEndpoint.aspx")
         val intermediateRealmPath = buildString {
             append("/$symbol/FS/LS")
@@ -286,7 +293,8 @@ internal class LoginHelper(
     }
 
     private suspend fun sendADFSCards(email: String, password: String): CertificateResponse {
-        val res = api.getForm(getADFSUrl(ADFSCards))
+        val url = getADFSUrl(ADFSCards)
+        val res = api.getForm(url)
 
         if (res.formAction.isBlank()) throw VulcanException("Invalid ADFS login page: '${res.title}'. Try again")
         val form = certificateAdapter.fromHtml(
@@ -318,8 +326,6 @@ internal class LoginHelper(
     }
 
     private fun getADFSUrl(type: Scrapper.LoginType): String {
-        val symbol = urlGenerator.symbol
-
         val firstStepReturnUrl = buildString {
             val realm = encode("$schema://uonetplus$domainSuffix.$host/$symbol/LoginEndpoint.aspx")
             val ctx = when (host) {
@@ -336,7 +342,7 @@ internal class LoginHelper(
         }
 
         val query = "?wa=wsignin1.0" +
-            "&wtrealm=" + encode("$schema://cufs$domainSuffix.$host${if (schema == "https") ":443" else ""}/$symbol/Account/LogOn") +
+            "&wtrealm=" + encode("$schema://cufs$domainSuffix.${urlGenerator.host}${if (schema == "https") ":443" else urlGenerator.port}/$symbol/Account/LogOn") +
             "&wctx=" + encode("rm=0&id=$id&ru=" + encode(firstStepReturnUrl)) +
             "&wct=" + encode(DateTimeFormatter.ISO_INSTANT.format(Instant.now().truncatedTo(ChronoUnit.SECONDS)))
 
@@ -350,8 +356,6 @@ internal class LoginHelper(
 
     @Suppress("DuplicatedCode")
     private fun getADFSLightScopedUrl(): String {
-        val symbol = urlGenerator.symbol
-
         val targetRealm = encode("$schema://uonetplus$domainSuffix.$host/$symbol/LoginEndpoint.aspx")
         val intermediateRealmPath = buildString {
             append("/$symbol/FS/LS")

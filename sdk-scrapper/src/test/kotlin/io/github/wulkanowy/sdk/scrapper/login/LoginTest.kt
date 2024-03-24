@@ -20,23 +20,15 @@ class LoginTest : BaseLocalTest() {
     private val normal by lazy {
         LoginHelper(
             loginType = Scrapper.LoginType.STANDARD,
-            schema = "http",
-            host = "fakelog.localhost:3000",
-            domainSuffix = "",
-            symbol = "default",
             cookieJarCabinet = CookieJarCabinet(),
             api = getService(LoginService::class.java, "http://fakelog.localhost:3000/"),
-            urlGenerator = UrlGenerator(URL("http://localhost/"), "", "lodz", ""),
+            urlGenerator = UrlGenerator(URL("http://fakelog.localhost:3000/"), "", "default", ""),
         )
     }
 
     private val adfs by lazy {
         LoginHelper(
             loginType = Scrapper.LoginType.ADFS,
-            schema = "http",
-            host = "fakelog.localhost:3000",
-            domainSuffix = "",
-            symbol = "default",
             cookieJarCabinet = CookieJarCabinet(),
             api = getService(
                 service = LoginService::class.java,
@@ -48,7 +40,7 @@ class LoginTest : BaseLocalTest() {
                     loginType = Scrapper.LoginType.ADFS,
                 ),
             ),
-            urlGenerator = UrlGenerator(URL("http://localhost/"), "", "lodz", ""),
+            urlGenerator = UrlGenerator(URL("http://fakelog.localhost:3000/"), "", "default", ""),
         )
     }
 

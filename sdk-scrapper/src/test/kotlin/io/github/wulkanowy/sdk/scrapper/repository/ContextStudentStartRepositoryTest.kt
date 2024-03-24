@@ -6,6 +6,7 @@ import io.github.wulkanowy.sdk.scrapper.login.LoginTest
 import io.github.wulkanowy.sdk.scrapper.messages.MessagesTest
 import io.github.wulkanowy.sdk.scrapper.register.RegisterTest
 import kotlinx.coroutines.runBlocking
+import okhttp3.logging.HttpLoggingInterceptor
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -15,7 +16,9 @@ class ContextStudentStartRepositoryTest : BaseLocalTest() {
         Scrapper().apply {
             ssl = false
             loginType = Scrapper.LoginType.STANDARD
-            host = "fakelog.localhost:3000" //
+            logLevel = HttpLoggingInterceptor.Level.BODY
+            host = "fakelog.localhost" //
+            port = 3000
             symbol = "Default"
             email = "jan@fakelog.cf"
             password = "jan123"

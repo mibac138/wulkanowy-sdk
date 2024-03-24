@@ -32,7 +32,8 @@ class ScrapperTest : BaseLocalTest() {
         }
 
         api.apply {
-            host = "fakelog.localhost:3000" //
+            host = "fakelog.localhost" //
+            port = 3000
         }
 
         try {

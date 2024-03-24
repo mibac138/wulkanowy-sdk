@@ -22,10 +22,6 @@ class RegisterTest : BaseLocalTest() {
     private val login by lazy {
         LoginHelper(
             loginType = Scrapper.LoginType.STANDARD,
-            schema = "http",
-            host = "fakelog.localhost:3000",
-            domainSuffix = "",
-            symbol = "default",
             cookieJarCabinet = CookieJarCabinet(),
             api = getService(
                 service = LoginService::class.java,
@@ -37,7 +33,7 @@ class RegisterTest : BaseLocalTest() {
                     loginType = Scrapper.LoginType.STANDARD,
                 ),
             ),
-            urlGenerator = UrlGenerator(URL("http://localhost/"), "", "lodz", ""),
+            urlGenerator = UrlGenerator(URL("http://fakelog.localhost:3000/"), "", "default", ""),
         )
     }
 
@@ -69,7 +65,8 @@ class RegisterTest : BaseLocalTest() {
             ),
             url = UrlGenerator(
                 schema = "http",
-                host = "fakelog.localhost:3000",
+                host = "fakelog.localhost",
+                port = 3000,
                 domainSuffix = "",
                 symbol = "default",
                 schoolId = "123",

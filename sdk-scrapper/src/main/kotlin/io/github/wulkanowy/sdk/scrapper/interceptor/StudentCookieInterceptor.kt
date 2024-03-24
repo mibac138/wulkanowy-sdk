@@ -1,16 +1,14 @@
 package io.github.wulkanowy.sdk.scrapper.interceptor
 
+import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.net.CookieStore
 import java.net.HttpCookie
-import java.net.URI
 
 internal class StudentCookieInterceptor(
     private val cookieStore: CookieStore,
-    private val schema: String,
-    private val host: String,
-    private val domainSuffix: String,
+    private val urlGenerator: UrlGenerator,
     diaryId: Int,
     kindergartenDiaryId: Int,
     studentId: Int,
@@ -26,10 +24,11 @@ internal class StudentCookieInterceptor(
 
     override fun intercept(chain: Interceptor.Chain): Response {
         cookiesData.forEach { (name, value) ->
+            val url = urlGenerator.generateBase(UrlGenerator.Site.STUDENT)
             HttpCookie(name, value.toString()).let {
                 it.path = "/"
-                it.domain = "uonetplus-uczen$domainSuffix.$host"
-                cookieStore.add(URI("$schema://${it.domain}"), it)
+                it.domain = url.host
+                cookieStore.add(url.toUri(), it)
             }
         }
 

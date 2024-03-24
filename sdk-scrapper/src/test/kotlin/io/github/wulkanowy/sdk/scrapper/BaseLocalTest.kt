@@ -143,10 +143,6 @@ abstract class BaseLocalTest : BaseTest() {
 
                     else -> LoginHelper(
                         loginType = loginType,
-                        schema = "http",
-                        host = "localhost",
-                        domainSuffix = "",
-                        symbol = "powiatwulkanowy",
                         cookieJarCabinet = CookieJarCabinet(),
                         api = getService(LoginService::class.java),
                         urlGenerator = urlGenerator,

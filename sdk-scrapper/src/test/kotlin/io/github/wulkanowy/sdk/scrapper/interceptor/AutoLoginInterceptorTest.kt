@@ -172,13 +172,9 @@ class AutoLoginInterceptorTest : BaseLocalTest() {
         loginService = getService(LoginService::class.java)
         loginHelper = LoginHelper(
             loginType = Scrapper.LoginType.STANDARD,
-            schema = "http",
-            host = "${server.hostName}:${server.port}",
-            domainSuffix = "",
-            symbol = "powiatwulkanowy",
             cookieJarCabinet = CookieJarCabinet(),
             api = loginService,
-            urlGenerator = UrlGenerator(URL("http://localhost/"), "", "lodz", "test"),
+            urlGenerator = UrlGenerator(URL("http://${server.hostName}:${server.port}/"), "", "powiatwulkanowy", "test"),
         )
     }
 

@@ -28,7 +28,8 @@ class ServiceManagerTest : BaseLocalTest() {
             logLevel = HttpLoggingInterceptor.Level.NONE,
             loginType = Scrapper.LoginType.STANDARD,
             schema = "http",
-            host = "fakelog.localhost:3000",
+            host = "fakelog.localhost",
+            port = 3000,
             domainSuffix = "",
             symbol = "default",
             email = "email",
@@ -62,7 +63,8 @@ class ServiceManagerTest : BaseLocalTest() {
             logLevel = HttpLoggingInterceptor.Level.NONE,
             loginType = Scrapper.LoginType.STANDARD,
             schema = "http",
-            host = "fakelog.localhost:3000",
+            host = "fakelog.localhost",
+            port = 3000,
             domainSuffix = "",
             symbol = "default",
             email = "email",
@@ -107,7 +109,8 @@ class ServiceManagerTest : BaseLocalTest() {
         val api = Scrapper().apply {
             logLevel = HttpLoggingInterceptor.Level.BASIC
             ssl = false
-            host = "fakelog.localhost:3000"
+            host = "fakelog.localhost"
+            port = 3000
             email = "jan@fakelog.cf"
             password = "jan123"
             symbol = ""
@@ -134,7 +137,8 @@ class ServiceManagerTest : BaseLocalTest() {
             logLevel = HttpLoggingInterceptor.Level.NONE,
             loginType = Scrapper.LoginType.STANDARD,
             schema = "http",
-            host = "fakelog.localhost:3000",
+            host = "fakelog.localhost",
+            port = 3000,
             domainSuffix = "",
             symbol = "default",
             email = "email",

@@ -45,6 +45,7 @@ internal class ServiceManager(
     private val loginType: Scrapper.LoginType,
     private val schema: String,
     private val host: String,
+    private val port: Int?,
     private val domainSuffix: String,
     private val symbol: String,
     private val email: String,
@@ -64,6 +65,7 @@ internal class ServiceManager(
         UrlGenerator(
             schema = schema,
             host = host,
+            port = port,
             domainSuffix = domainSuffix,
             symbol = symbol,
             schoolId = schoolId,
@@ -73,10 +75,6 @@ internal class ServiceManager(
     private val loginHelper by lazy {
         LoginHelper(
             loginType = loginType,
-            schema = schema,
-            host = host,
-            domainSuffix = domainSuffix,
-            symbol = symbol,
             cookieJarCabinet = cookieJarCabinet,
             api = getLoginService(),
             urlGenerator = urlGenerator,
@@ -191,9 +189,7 @@ internal class ServiceManager(
             client.addInterceptor(
                 StudentCookieInterceptor(
                     cookieStore = cookieJarCabinet.userCookieManager.cookieStore,
-                    schema = schema,
-                    host = host,
-                    domainSuffix = domainSuffix,
+                    urlGenerator = urlGenerator,
                     diaryId = diaryId,
                     kindergartenDiaryId = kindergartenDiaryId,
                     studentId = studentId,
