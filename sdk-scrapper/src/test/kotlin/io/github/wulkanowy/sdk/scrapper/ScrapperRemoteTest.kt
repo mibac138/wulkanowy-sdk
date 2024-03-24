@@ -18,13 +18,15 @@ import java.time.Month
 @Ignore
 class ScrapperRemoteTest : BaseTest() {
 
-    private var api = Scrapper(userAgent = androidUserAgentString("9.0", buildTag = "Wulkanowy"))
+    private var api = Scrapper(
+        userAgent = androidUserAgentString("9.0", buildTag = "Wulkanowy"),
+        urlGenerator = UrlGenerator(schema = "https", host = "fakelog.cf", symbol = "powiatwulkanowy", schoolId = "123456"),
+    )
 
     @Before
     fun setUp() {
         api.apply {
             loginType = Scrapper.LoginType.STANDARD
-            urlGenerator = UrlGenerator(schema = "https", host = "fakelog.cf", symbol = "powiatwulkanowy", schoolId = "123456")
             email = "jan@fakelog.cf"
             password = "jan123"
             studentId = 1

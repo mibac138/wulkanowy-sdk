@@ -58,6 +58,7 @@ import java.util.concurrent.locks.ReentrantLock
 private val httpClientWithBasicLogging = OkHttpClient().newBuilder().addNetworkInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)).build()
 
 class Scrapper(
+    val urlGenerator: UrlGenerator = UrlGenerator.Empty,
     val userAgent: String = androidUserAgentString(),
     httpClient: OkHttpClient = httpClientWithBasicLogging,
 ) {
@@ -78,12 +79,6 @@ class Scrapper(
     private val cookieJarCabinet = CookieJarCabinet()
 
     var isEduOne = false
-
-    var urlGenerator: UrlGenerator = UrlGenerator.Empty
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
 
     var loginType: LoginType = LoginType.AUTO
         set(value) {
@@ -157,7 +152,7 @@ class Scrapper(
         appInterceptors.add(interceptor to network)
     }
 
-    private val okHttpFactory by resettableLazy(changeManager) { OkHttpClientBuilderFactory(host = urlGenerator.host, base = httpClient, userAgent = userAgent) }
+    private val okHttpFactory = OkHttpClientBuilderFactory(host = urlGenerator.host, base = httpClient, userAgent = userAgent)
 
     private val headersByHost: MutableMap<String, ModuleHeaders> = mutableMapOf()
     private val loginLock = ReentrantLock(true)

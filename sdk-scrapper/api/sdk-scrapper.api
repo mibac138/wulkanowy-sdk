@@ -1,7 +1,7 @@
 public final class io/github/wulkanowy/sdk/scrapper/Scrapper {
 	public fun <init> ()V
-	public fun <init> (Ljava/lang/String;Lokhttp3/OkHttpClient;)V
-	public synthetic fun <init> (Ljava/lang/String;Lokhttp3/OkHttpClient;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator;Ljava/lang/String;Lokhttp3/OkHttpClient;)V
+	public synthetic fun <init> (Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator;Ljava/lang/String;Lokhttp3/OkHttpClient;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun addInterceptor (Lokhttp3/Interceptor;Z)V
 	public static synthetic fun addInterceptor$default (Lio/github/wulkanowy/sdk/scrapper/Scrapper;Lokhttp3/Interceptor;ZILjava/lang/Object;)V
 	public final fun authorizePermission (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -91,7 +91,6 @@ public final class io/github/wulkanowy/sdk/scrapper/Scrapper {
 	public final fun setSchoolYear (I)V
 	public final fun setStudentId (I)V
 	public final fun setUnitId (I)V
-	public final fun setUrlGenerator (Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator;)V
 	public final fun unregisterDevice (ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 

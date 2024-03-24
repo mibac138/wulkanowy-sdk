@@ -15,7 +15,10 @@ import org.junit.Test
 class ContextStudentStartRepositoryTest : BaseLocalTest() {
 
     private val api by lazy {
-        Scrapper(httpClient = OkHttpClient().newBuilder().addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)).build()).apply {
+        Scrapper(
+            urlGenerator = UrlGenerator(schema = "http", host = "fakelog.localhost", port = 3000, symbol = "Default", schoolId = "123456"),
+            httpClient = OkHttpClient().newBuilder().addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)).build(),
+        ).apply {
             loginType = Scrapper.LoginType.STANDARD
             urlGenerator = UrlGenerator(schema = "http", host = "fakelog.localhost", port = 3000, symbol = "Default", schoolId = "123456")
             email = "jan@fakelog.cf"

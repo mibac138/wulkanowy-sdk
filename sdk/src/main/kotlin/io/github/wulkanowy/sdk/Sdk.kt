@@ -129,8 +129,8 @@ class Sdk internal constructor(config: SdkConfig) {
             val it = config.scrapperConfig!!
             val loggingInterceptor = it.logStyle.toLoggingInterceptor()
             val httpClient = it.httpClient.newBuilder().addNetworkInterceptor(loggingInterceptor).build()
-            scrapper = Scrapper(userAgent = it.userAgent, httpClient = httpClient)
-            scrapper.urlGenerator = UrlGenerator(url = URL(it.baseUrl), domainSuffix = it.domainSuffix, schoolId = config.schoolSymbol!!, symbol = it.symbol)
+            val urlGenerator = UrlGenerator(url = URL(it.baseUrl), domainSuffix = it.domainSuffix, schoolId = config.schoolSymbol!!, symbol = it.symbol)
+            scrapper = Scrapper(userAgent = it.userAgent, httpClient = httpClient, urlGenerator = urlGenerator)
             scrapper.isEduOne = it.isEduOne
             scrapper.email = it.email
             scrapper.password = it.password
