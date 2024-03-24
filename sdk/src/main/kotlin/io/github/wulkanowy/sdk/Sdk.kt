@@ -161,15 +161,13 @@ class Sdk internal constructor(private val config: SdkConfig) {
                     val student = school.subjects
                         .firstOrNull() as? RegisterStudent ?: return@mapNotNull null
 
-                    TODO("Create scrapper using config copy constructor")
-                    // scrapper.also {
-                    //     it.symbol = symbol.symbol
-                    //     it.schoolId = school.schoolId
-                    //     it.studentId = student.studentId
-                    //     it.diaryId = -1
-                    //     it.classId = student.classId
-                    //     it.loginType = Scrapper.LoginType.valueOf(scrapperUser.loginType!!.name)
-                    // }
+                    val scrapper = config.copy(schoolSymbol = symbol.symbol, studentId = student.studentId).apply {
+                        scrapperConfig?.let {
+                            it.diaryId = -1
+                            it.classId = student.classId
+                            it.loginType = Scrapper.LoginType.valueOf(scrapperUser.loginType!!.name)
+                        }
+                    }.createScrapperIfConfigured() ?: throw IllegalStateException()
                     val token = scrapper.getToken()
                     val hebeUser = getStudentsFromHebe(
                         token = token.token,
@@ -567,48 +565,45 @@ sealed class LogStyle {
 
 sealed class CommonSdkConfig {
     var logStyle: LogStyle = LogStyle.Level(HttpLoggingInterceptor.Level.BASIC)
-    var buildTag = "SM-G950F Build/NRD90M"
 }
 
-class HebeConfig : CommonSdkConfig() {
-    var httpClient = OkHttpClient()
-    var baseUrl = ""
-    var keyId = ""
-    var privatePem = ""
-    var deviceModel: String
-        get() = buildTag
-        set(value) {
-            buildTag = value
-        }
-}
+data class HebeConfig(
+    var httpClient: OkHttpClient = OkHttpClient(),
+    var baseUrl: String = "",
+    var keyId: String = "",
+    var privatePem: String = "",
+    var deviceModel: String = "SM-G950F Build/NRD90M",
+) : CommonSdkConfig()
 
-class ScrapperConfig : CommonSdkConfig() {
-    var httpClient = OkHttpClient()
-    var baseUrl = ""
-    var domainSuffix: String = ""
-    var isEduOne = false
-    var email = ""
-    var password = ""
-    var classId = 0
-    var diaryId = 0
-    var unitId = 0
-    var kindergartenDiaryId = 0
-    var schoolYear = 0
-    var symbol = ""
-    var loginType = Scrapper.LoginType.AUTO
-    var userAgent: String = androidUserAgentString()
-    var emptyCookieJarInterceptor: Boolean = false
+data class ScrapperConfig(
+    var httpClient: OkHttpClient = OkHttpClient(),
+    var baseUrl: String = "",
+    var domainSuffix: String = "",
+    var isEduOne: Boolean = false,
+    var email: String = "",
+    var password: String = "",
+    var classId: Int = 0,
+    var diaryId: Int = 0,
+    var unitId: Int = 0,
+    var kindergartenDiaryId: Int = 0,
+    var schoolYear: Int = 0,
+    var symbol: String = "",
+    var loginType: Scrapper.LoginType = Scrapper.LoginType.AUTO,
+    var userAgent: String = androidUserAgentString(),
+    var emptyCookieJarInterceptor: Boolean = false,
+) : CommonSdkConfig() {
 
     fun androidUserAgent(androidVersion: String, buildTag: String, webkitRev: String = "537.36", chromeRev: String = "120.0.0.0") = this.also {
         userAgent = androidUserAgentString(androidVersion, buildTag, webkitRev, chromeRev)
     }
 }
 
-class SdkConfig {
-    internal var scrapperConfig: ScrapperConfig? = null
-    internal var hebeConfig: HebeConfig? = null
-    internal var schoolSymbol: String? = null
-    internal var studentId: Int? = null
+data class SdkConfig(
+    internal var scrapperConfig: ScrapperConfig? = null,
+    internal var hebeConfig: HebeConfig? = null,
+    internal var schoolSymbol: String? = null,
+    internal var studentId: Int? = null,
+) {
 
     fun configureScrapper(configure: ScrapperConfig.() -> Unit) = this.also {
         scrapperConfig = ScrapperConfig().also(configure)
@@ -626,8 +621,6 @@ class SdkConfig {
     fun withSchoolSymbol(symbol: String) = this.also { schoolSymbol = symbol }
 
     fun withStudentId(studentId: Int) = this.also { this.studentId = studentId }
-
-    // TODO copy constructor
 
     internal fun createScrapperIfConfigured(): Scrapper? = scrapperConfig?.let {
         val loggingInterceptor = it.logStyle.toLoggingInterceptor()
