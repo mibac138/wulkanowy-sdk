@@ -23,7 +23,7 @@ class ServiceManagerTest : BaseLocalTest() {
     @Test
     fun interceptorTest() {
         val manager = ServiceManager(
-            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost"),
+            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost", userAgent = ""),
             cookieJarCabinet = CookieJarCabinet(),
             loginType = Scrapper.LoginType.STANDARD,
             urlGenerator = UrlGenerator(
@@ -42,7 +42,6 @@ class ServiceManagerTest : BaseLocalTest() {
             schoolYear = 2019,
             emptyCookieJarIntercept = false,
             loginLock = ReentrantLock(true),
-            userAgent = "",
             headersByHost = mutableMapOf(),
         )
         manager.setInterceptor({ throw ScrapperException("Test") })
@@ -59,7 +58,7 @@ class ServiceManagerTest : BaseLocalTest() {
         server.enqueue(MockResponse().setBody(NotesTest::class.java.getResource("UwagiIOsiagniecia.json").readText()))
         server.start(3000)
         val manager = ServiceManager(
-            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost"),
+            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost", userAgent = ""),
             cookieJarCabinet = CookieJarCabinet(),
             loginType = Scrapper.LoginType.STANDARD,
             urlGenerator = UrlGenerator(
@@ -78,7 +77,6 @@ class ServiceManagerTest : BaseLocalTest() {
             schoolYear = 2019,
             emptyCookieJarIntercept = false,
             loginLock = ReentrantLock(true),
-            userAgent = "",
             headersByHost = mutableMapOf(),
         )
         manager.setInterceptor(
@@ -130,7 +128,7 @@ class ServiceManagerTest : BaseLocalTest() {
         server.enqueue(MockResponse().setResponseCode(503))
         server.start(3000)
         val manager = ServiceManager(
-            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost"),
+            okHttpClientBuilderFactory = OkHttpClientBuilderFactory("fakelog.localhost", userAgent = ""),
             cookieJarCabinet = CookieJarCabinet(),
             loginType = Scrapper.LoginType.STANDARD,
             urlGenerator = UrlGenerator(
@@ -149,7 +147,6 @@ class ServiceManagerTest : BaseLocalTest() {
             schoolYear = 2019,
             emptyCookieJarIntercept = false,
             loginLock = ReentrantLock(true),
-            userAgent = "",
             headersByHost = mutableMapOf(),
         )
 

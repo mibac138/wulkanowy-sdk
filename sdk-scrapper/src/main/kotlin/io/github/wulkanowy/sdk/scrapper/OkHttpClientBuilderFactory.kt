@@ -1,5 +1,6 @@
 package io.github.wulkanowy.sdk.scrapper
 
+import io.github.wulkanowy.sdk.scrapper.interceptor.UserAgentInterceptor
 import okhttp3.OkHttpClient
 import java.security.KeyStore
 import java.util.concurrent.TimeUnit
@@ -10,6 +11,7 @@ private const val TIMEOUT_IN_SECONDS = 30L
 
 internal class OkHttpClientBuilderFactory(
     host: String,
+    userAgent: String = androidUserAgentString(),
     base: OkHttpClient = OkHttpClient(),
 ) {
 
@@ -30,6 +32,7 @@ internal class OkHttpClientBuilderFactory(
                     }
                 }
             }
+            .addInterceptor(UserAgentInterceptor(userAgent))
             .build()
     }
 

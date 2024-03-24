@@ -12,7 +12,6 @@ import io.github.wulkanowy.sdk.scrapper.interceptor.HttpErrorInterceptor
 import io.github.wulkanowy.sdk.scrapper.interceptor.ModuleHeaders
 import io.github.wulkanowy.sdk.scrapper.interceptor.NullInterceptor
 import io.github.wulkanowy.sdk.scrapper.interceptor.StudentCookieInterceptor
-import io.github.wulkanowy.sdk.scrapper.interceptor.UserAgentInterceptor
 import io.github.wulkanowy.sdk.scrapper.login.LoginHelper
 import io.github.wulkanowy.sdk.scrapper.login.LoginResult
 import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator
@@ -46,7 +45,6 @@ internal class ServiceManager(
     loginLock: ReentrantLock,
     headersByHost: MutableMap<String, ModuleHeaders>,
     emptyCookieJarIntercept: Boolean,
-    userAgent: String,
 ) {
 
     private val loginHelper by lazy {
@@ -90,7 +88,6 @@ internal class ServiceManager(
             fetchModuleCookies = { site -> loginHelper.loginModule(site) },
         ) to false,
         (EmptyCookieJarInterceptor(cookieJarCabinet.userCookieManager.cookieStore).takeIf { emptyCookieJarIntercept } ?: NullInterceptor) to false,
-        UserAgentInterceptor(userAgent) to false,
         HttpErrorInterceptor() to false,
     )
 

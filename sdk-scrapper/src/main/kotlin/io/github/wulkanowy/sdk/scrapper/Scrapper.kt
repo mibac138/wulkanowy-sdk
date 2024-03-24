@@ -157,7 +157,7 @@ class Scrapper(
         appInterceptors.add(interceptor to network)
     }
 
-    private val okHttpFactory by resettableLazy(changeManager) { OkHttpClientBuilderFactory(host = urlGenerator.host, base = httpClient) }
+    private val okHttpFactory by resettableLazy(changeManager) { OkHttpClientBuilderFactory(host = urlGenerator.host, base = httpClient, userAgent = userAgent) }
 
     private val headersByHost: MutableMap<String, ModuleHeaders> = mutableMapOf()
     private val loginLock = ReentrantLock(true)
@@ -174,7 +174,6 @@ class Scrapper(
             kindergartenDiaryId = kindergartenDiaryId,
             schoolYear = schoolYear,
             emptyCookieJarIntercept = emptyCookieJarInterceptor,
-            userAgent = userAgent,
             loginLock = loginLock,
             headersByHost = headersByHost,
         ).apply {
