@@ -61,7 +61,7 @@ abstract class BaseLocalTest : BaseTest() {
         val okHttp = getOkHttp(errorInterceptor = true, autoLoginInterceptorOn = true, loginType = loginType, autoLogin = autoLogin)
         return StudentRepository(
             api = getService(StudentService::class.java, server.url("/").toString(), false, okHttp),
-            urlGenerator = UrlGenerator.EMPTY,
+            urlGenerator = UrlGenerator.Empty,
         )
     }
 

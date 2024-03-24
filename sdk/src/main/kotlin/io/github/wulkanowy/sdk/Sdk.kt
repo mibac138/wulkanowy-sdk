@@ -69,11 +69,13 @@ import io.github.wulkanowy.sdk.pojo.Timetable
 import io.github.wulkanowy.sdk.pojo.Token
 import io.github.wulkanowy.sdk.scrapper.Scrapper
 import io.github.wulkanowy.sdk.scrapper.androidUserAgentString
+import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Interceptor
 import okhttp3.logging.HttpLoggingInterceptor
 import java.net.CookieManager
+import java.net.URL
 import java.time.LocalDate
 import java.time.ZoneId
 
@@ -125,19 +127,16 @@ class Sdk internal constructor(config: SdkConfig) {
         if (config.scrapperConfig != null) {
             val it = config.scrapperConfig!!
             scrapper = Scrapper(userAgent = it.userAgent)
-            scrapper.baseUrl = it.baseUrl
-            scrapper.domainSuffix = it.domainSuffix
+            scrapper.urlGenerator = UrlGenerator(url = URL(it.baseUrl), domainSuffix = it.domainSuffix, schoolId = config.schoolSymbol!!, symbol = it.symbol)
             scrapper.isEduOne = it.isEduOne
             scrapper.email = it.email
             scrapper.password = it.password
-            scrapper.schoolId = config.schoolSymbol!!
             scrapper.classId = it.classId
             scrapper.studentId = config.studentId!!
             scrapper.diaryId = it.diaryId
             scrapper.unitId = it.unitId
             scrapper.kindergartenDiaryId = it.kindergartenDiaryId
             scrapper.schoolYear = it.schoolYear
-            scrapper.symbol = it.symbol
             scrapper.loginType = it.loginType
             scrapper.emptyCookieJarInterceptor = it.emptyCookieJarInterceptor
             when (val logStyle = it.logStyle) {
@@ -213,8 +212,9 @@ class Sdk internal constructor(config: SdkConfig) {
                     val student = school.subjects
                         .firstOrNull() as? RegisterStudent ?: return@mapNotNull null
                     scrapper.also {
-                        it.symbol = symbol.symbol
-                        it.schoolId = school.schoolId
+                        // TODO
+                        // it.symbol = symbol.symbol
+                        // it.schoolId = school.schoolId
                         it.studentId = student.studentId
                         it.diaryId = -1
                         it.classId = student.classId

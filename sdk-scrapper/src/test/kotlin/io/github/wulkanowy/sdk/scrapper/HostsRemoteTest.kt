@@ -1,6 +1,7 @@
 package io.github.wulkanowy.sdk.scrapper
 
 import io.github.wulkanowy.sdk.scrapper.login.BadCredentialsException
+import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator
 import kotlinx.coroutines.runBlocking
 import okhttp3.logging.HttpLoggingInterceptor
 import org.junit.Ignore
@@ -45,9 +46,7 @@ class HostsRemoteTest : BaseTest() {
     private fun getScrapper(domain: String, startSymbol: String): Scrapper = Scrapper().apply {
         logLevel = HttpLoggingInterceptor.Level.BASIC
         loginType = Scrapper.LoginType.AUTO
-        ssl = true
-        host = domain
-        symbol = startSymbol
+        urlGenerator = UrlGenerator(schema = "https", host = domain, symbol = startSymbol)
         email = "jan@fakelog.cf"
         password = "jan123"
     }

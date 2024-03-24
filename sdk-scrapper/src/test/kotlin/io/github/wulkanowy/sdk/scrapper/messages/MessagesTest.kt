@@ -22,7 +22,7 @@ class MessagesTest : BaseLocalTest() {
     private val api by lazy {
         MessagesRepository(
             api = getService(MessagesService::class.java, "http://fakelog.localhost:3000/", false),
-            urlGenerator = UrlGenerator.EMPTY,
+            urlGenerator = UrlGenerator.Empty,
         )
     }
 

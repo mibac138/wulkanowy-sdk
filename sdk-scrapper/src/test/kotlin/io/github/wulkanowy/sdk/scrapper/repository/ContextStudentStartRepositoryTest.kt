@@ -3,6 +3,7 @@ package io.github.wulkanowy.sdk.scrapper.repository
 import io.github.wulkanowy.sdk.scrapper.BaseLocalTest
 import io.github.wulkanowy.sdk.scrapper.Scrapper
 import io.github.wulkanowy.sdk.scrapper.login.LoginTest
+import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator
 import io.github.wulkanowy.sdk.scrapper.messages.MessagesTest
 import io.github.wulkanowy.sdk.scrapper.register.RegisterTest
 import kotlinx.coroutines.runBlocking
@@ -14,15 +15,11 @@ class ContextStudentStartRepositoryTest : BaseLocalTest() {
 
     private val api by lazy {
         Scrapper().apply {
-            ssl = false
             loginType = Scrapper.LoginType.STANDARD
             logLevel = HttpLoggingInterceptor.Level.BODY
-            host = "fakelog.localhost" //
-            port = 3000
-            symbol = "Default"
+            urlGenerator = UrlGenerator(schema = "http", host = "fakelog.localhost", port = 3000, symbol = "Default", schoolId = "123456")
             email = "jan@fakelog.cf"
             password = "jan123"
-            schoolId = "123456"
             diaryId = 101
         }
     }

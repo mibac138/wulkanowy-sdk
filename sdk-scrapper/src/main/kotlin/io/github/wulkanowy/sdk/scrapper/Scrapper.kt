@@ -51,7 +51,6 @@ import io.github.wulkanowy.sdk.scrapper.timetable.Timetable
 import okhttp3.Interceptor
 import okhttp3.logging.HttpLoggingInterceptor
 import java.net.CookieManager
-import java.net.URL
 import java.time.LocalDate
 import java.util.concurrent.locks.ReentrantLock
 
@@ -80,34 +79,7 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
             field = value
         }
 
-    var baseUrl: String = "https://fakelog.cf"
-        set(value) {
-            field = value
-            ssl = baseUrl.startsWith("https")
-            val url = URL(value)
-            host = url.host
-            port = url.port.takeUnless { it == -1 }
-        }
-
-    var ssl: Boolean = true
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
-
-    var host: String = "fakelog.cf"
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
-
-    var port: Int? = null
-        set(value) {
-            if (field != value) changeManager.reset()
-            field = value
-        }
-
-    var domainSuffix: String = ""
+    var urlGenerator: UrlGenerator = UrlGenerator.Empty
         set(value) {
             if (field != value) changeManager.reset()
             field = value
@@ -117,15 +89,6 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
         set(value) {
             if (field != value) changeManager.reset()
             field = value
-        }
-
-    var symbol: String = "Default"
-        set(value) {
-            if (field != value) {
-                changeManager.reset()
-                cookieJarCabinet.onUserChange()
-            }
-            field = if (value.isBlank()) "Default" else value.getNormalizedSymbol()
         }
 
     var email: String = ""
@@ -143,12 +106,6 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
                 changeManager.reset()
                 cookieJarCabinet.onUserChange()
             }
-            field = value
-        }
-
-    var schoolId: String = ""
-        set(value) {
-            if (field != value) changeManager.reset()
             field = value
         }
 
@@ -200,9 +157,7 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
         appInterceptors.add(interceptor to network)
     }
 
-    private val schema by resettableLazy(changeManager) { "http" + if (ssl) "s" else "" }
-
-    private val okHttpFactory by resettableLazy(changeManager) { OkHttpClientBuilderFactory(host) }
+    private val okHttpFactory by resettableLazy(changeManager) { OkHttpClientBuilderFactory(urlGenerator.host) }
 
     private val headersByHost: MutableMap<String, ModuleHeaders> = mutableMapOf()
     private val loginLock = ReentrantLock(true)
@@ -212,7 +167,7 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
             cookieJarCabinet = cookieJarCabinet,
             logLevel = logLevel,
             loginType = loginType,
-            urlGenerator = UrlGenerator(schema = schema, host = host, port = port, domainSuffix = domainSuffix, symbol = symbol, schoolId = schoolId),
+            urlGenerator = urlGenerator,
             email = email,
             password = password,
             studentId = studentId,
@@ -236,7 +191,7 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
 
     private val register by resettableLazy(changeManager) {
         RegisterRepository(
-            startSymbol = symbol,
+            startSymbol = urlGenerator.symbol,
             email = email,
             password = password,
             loginHelperFactory = { urlGenerator ->
@@ -299,10 +254,11 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
 
     suspend fun isSymbolNotExist(symbol: String): Boolean = symbolRepository.isSymbolNotExist(symbol)
 
-    suspend fun getPasswordResetCaptcha(registerBaseUrl: String, symbol: String): Pair<String, String> = account.getPasswordResetCaptcha(registerBaseUrl, domainSuffix, symbol)
+    suspend fun getPasswordResetCaptcha(registerBaseUrl: String, symbol: String): Pair<String, String> =
+        account.getPasswordResetCaptcha(registerBaseUrl, urlGenerator.domainSuffix, symbol)
 
     suspend fun sendPasswordResetRequest(registerBaseUrl: String, symbol: String, email: String, captchaCode: String): String {
-        return account.sendPasswordResetRequest(registerBaseUrl, domainSuffix, symbol, email.trim(), captchaCode)
+        return account.sendPasswordResetRequest(registerBaseUrl, urlGenerator.domainSuffix, symbol, email.trim(), captchaCode)
     }
 
     suspend fun getUserSubjects(): RegisterUser = register.getUserSubjects()

@@ -113,12 +113,9 @@ class ServiceManagerTest : BaseLocalTest() {
 
         val api = Scrapper().apply {
             logLevel = HttpLoggingInterceptor.Level.BASIC
-            ssl = false
-            host = "fakelog.localhost"
-            port = 3000
+            urlGenerator = UrlGenerator(schema = "http", host = "fakelog.localhost", symbol = "Default", port = 3000, schoolId = "123456")
             email = "jan@fakelog.cf"
             password = "jan123"
-            symbol = ""
         }
 
         try {

@@ -12,7 +12,6 @@ public final class io/github/wulkanowy/sdk/scrapper/Scrapper {
 	public static synthetic fun getAttendance$default (Lio/github/wulkanowy/sdk/scrapper/Scrapper;Ljava/time/LocalDate;Ljava/time/LocalDate;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun getAttendanceSummary (Ljava/lang/Integer;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun getAttendanceSummary$default (Lio/github/wulkanowy/sdk/scrapper/Scrapper;Ljava/lang/Integer;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public final fun getBaseUrl ()Ljava/lang/String;
 	public final fun getClassId ()I
 	public final fun getCompletedLessons (Ljava/time/LocalDate;Ljava/time/LocalDate;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun getCompletedLessons$default (Lio/github/wulkanowy/sdk/scrapper/Scrapper;Ljava/time/LocalDate;Ljava/time/LocalDate;ILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
@@ -22,7 +21,6 @@ public final class io/github/wulkanowy/sdk/scrapper/Scrapper {
 	public static synthetic fun getDeletedMessages$default (Lio/github/wulkanowy/sdk/scrapper/Scrapper;Ljava/lang/String;IILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun getDiaryId ()I
 	public final fun getDirectorInformation (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun getDomainSuffix ()Ljava/lang/String;
 	public final fun getEmail ()Ljava/lang/String;
 	public final fun getEmptyCookieJarInterceptor ()Z
 	public final fun getExams (Ljava/time/LocalDate;Ljava/time/LocalDate;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
@@ -34,7 +32,6 @@ public final class io/github/wulkanowy/sdk/scrapper/Scrapper {
 	public final fun getGradesSemesterStatistics (ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getHomework (Ljava/time/LocalDate;Ljava/time/LocalDate;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun getHomework$default (Lio/github/wulkanowy/sdk/scrapper/Scrapper;Ljava/time/LocalDate;Ljava/time/LocalDate;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public final fun getHost ()Ljava/lang/String;
 	public final fun getKidsLessonPlan (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getKidsLuckyNumbers (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getKindergartenDiaryId ()I
@@ -59,25 +56,23 @@ public final class io/github/wulkanowy/sdk/scrapper/Scrapper {
 	public final fun getRecipients (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getRegisteredDevices (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getSchool (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun getSchoolId ()Ljava/lang/String;
 	public final fun getSchoolYear ()I
 	public final fun getSelfGovernments (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getSemesters (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getSentMessages (Ljava/lang/String;IILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun getSentMessages$default (Lio/github/wulkanowy/sdk/scrapper/Scrapper;Ljava/lang/String;IILkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public final fun getSsl ()Z
 	public final fun getStudentId ()I
 	public final fun getStudentInfo (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getStudentPhoto (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getStudentThreats (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getStudentsTrips (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getSubjects (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
-	public final fun getSymbol ()Ljava/lang/String;
 	public final fun getTeachers (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getTimetable (Ljava/time/LocalDate;Ljava/time/LocalDate;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun getTimetable$default (Lio/github/wulkanowy/sdk/scrapper/Scrapper;Ljava/time/LocalDate;Ljava/time/LocalDate;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
 	public final fun getToken (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun getUnitId ()I
+	public final fun getUrlGenerator ()Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator;
 	public final fun getUserAgent ()Ljava/lang/String;
 	public final fun getUserSubjects (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun isEduOne ()Z
@@ -86,24 +81,19 @@ public final class io/github/wulkanowy/sdk/scrapper/Scrapper {
 	public final fun sendMessage (Ljava/lang/String;Ljava/lang/String;Ljava/util/List;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun sendPasswordResetRequest (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun setAdditionalCookieManager (Ljava/net/CookieManager;)V
-	public final fun setBaseUrl (Ljava/lang/String;)V
 	public final fun setClassId (I)V
 	public final fun setDiaryId (I)V
-	public final fun setDomainSuffix (Ljava/lang/String;)V
 	public final fun setEduOne (Z)V
 	public final fun setEmail (Ljava/lang/String;)V
 	public final fun setEmptyCookieJarInterceptor (Z)V
-	public final fun setHost (Ljava/lang/String;)V
 	public final fun setKindergartenDiaryId (I)V
 	public final fun setLogLevel (Lokhttp3/logging/HttpLoggingInterceptor$Level;)V
 	public final fun setLoginType (Lio/github/wulkanowy/sdk/scrapper/Scrapper$LoginType;)V
 	public final fun setPassword (Ljava/lang/String;)V
-	public final fun setSchoolId (Ljava/lang/String;)V
 	public final fun setSchoolYear (I)V
-	public final fun setSsl (Z)V
 	public final fun setStudentId (I)V
-	public final fun setSymbol (Ljava/lang/String;)V
 	public final fun setUnitId (I)V
+	public final fun setUrlGenerator (Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator;)V
 	public final fun unregisterDevice (ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
 }
 
@@ -1004,6 +994,43 @@ public final class io/github/wulkanowy/sdk/scrapper/login/NotLoggedInException :
 
 public final class io/github/wulkanowy/sdk/scrapper/login/PasswordChangeRequiredException : io/github/wulkanowy/sdk/scrapper/exception/ScrapperException {
 	public final fun getRedirectUrl ()Ljava/lang/String;
+}
+
+public final class io/github/wulkanowy/sdk/scrapper/login/UrlGenerator {
+	public static final field Companion Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun <init> (Ljava/net/URL;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator;
+	public static synthetic fun copy$default (Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator;
+	public final fun createReferer (Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator$Site;)Ljava/lang/String;
+	public final fun generateBase (Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator$Site;)Lokhttp3/HttpUrl;
+	public final fun generateWithSymbol (Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator$Site;)Ljava/lang/String;
+	public final fun getDomainSuffix ()Ljava/lang/String;
+	public static final fun getEmpty ()Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator;
+	public final fun getHost ()Ljava/lang/String;
+	public final fun getPort ()Ljava/lang/Integer;
+	public final fun getReferenceUrl ()Ljava/lang/String;
+	public final fun getSchema ()Ljava/lang/String;
+	public final fun getSchoolId ()Ljava/lang/String;
+	public final fun getSymbol ()Ljava/lang/String;
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/wulkanowy/sdk/scrapper/login/UrlGenerator$Companion {
+	public final fun getEmpty ()Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator;
+}
+
+public final class io/github/wulkanowy/sdk/scrapper/login/UrlGenerator$Site : java/lang/Enum {
+	public static final field HOME Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator$Site;
+	public static final field LOGIN Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator$Site;
+	public static final field MESSAGES Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator$Site;
+	public static final field STUDENT Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator$Site;
+	public static final field STUDENT_PLUS Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator$Site;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun isStudent ()Z
+	public static fun valueOf (Ljava/lang/String;)Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator$Site;
+	public static fun values ()[Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator$Site;
 }
 
 public final class io/github/wulkanowy/sdk/scrapper/menu/Meal {

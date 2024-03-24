@@ -1,6 +1,7 @@
 package io.github.wulkanowy.sdk.scrapper
 
 import io.github.wulkanowy.sdk.scrapper.attendance.AttendanceCategory
+import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator
 import io.github.wulkanowy.sdk.scrapper.messages.Folder
 import io.github.wulkanowy.sdk.scrapper.register.RegisterStudent
 import kotlinx.coroutines.runBlocking
@@ -25,12 +26,9 @@ class ScrapperRemoteTest : BaseTest() {
         api.apply {
             logLevel = HttpLoggingInterceptor.Level.BASIC
             loginType = Scrapper.LoginType.STANDARD
-            ssl = true
-            host = "fakelog.cf"
-            symbol = "powiatwulkanowy"
+            urlGenerator = UrlGenerator(schema = "https", host = "fakelog.cf", symbol = "powiatwulkanowy", schoolId = "123456")
             email = "jan@fakelog.cf"
             password = "jan123"
-            schoolId = "123456"
             studentId = 1
             diaryId = 101
             kindergartenDiaryId = 1
