@@ -19,6 +19,7 @@ import io.github.wulkanowy.sdk.scrapper.home.LuckyNumber
 import io.github.wulkanowy.sdk.scrapper.homework.Homework
 import io.github.wulkanowy.sdk.scrapper.interceptor.ModuleHeaders
 import io.github.wulkanowy.sdk.scrapper.login.LoginHelper
+import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator
 import io.github.wulkanowy.sdk.scrapper.menu.Menu
 import io.github.wulkanowy.sdk.scrapper.messages.Folder
 import io.github.wulkanowy.sdk.scrapper.messages.Mailbox
@@ -213,14 +214,9 @@ class Scrapper(val userAgent: String = androidUserAgentString()) {
             cookieJarCabinet = cookieJarCabinet,
             logLevel = logLevel,
             loginType = loginType,
-            schema = schema,
-            host = host,
-            port = port,
-            domainSuffix = domainSuffix,
-            symbol = normalizedSymbol,
+            urlGenerator = UrlGenerator(schema = schema, host = host, port = port, domainSuffix = domainSuffix, symbol = normalizedSymbol, schoolId = schoolId),
             email = email,
             password = password,
-            schoolId = schoolId,
             studentId = studentId,
             diaryId = diaryId,
             kindergartenDiaryId = kindergartenDiaryId,

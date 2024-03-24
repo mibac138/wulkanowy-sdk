@@ -38,14 +38,9 @@ internal class ServiceManager(
     private val cookieJarCabinet: CookieJarCabinet,
     logLevel: HttpLoggingInterceptor.Level,
     loginType: Scrapper.LoginType,
-    schema: String,
-    host: String,
-    port: Int?,
-    domainSuffix: String,
-    symbol: String,
+    val urlGenerator: UrlGenerator,
     private val email: String,
     private val password: String,
-    private val schoolId: String,
     private val studentId: Int,
     private val diaryId: Int,
     private val kindergartenDiaryId: Int,
@@ -55,17 +50,6 @@ internal class ServiceManager(
     emptyCookieJarIntercept: Boolean,
     userAgent: String,
 ) {
-
-    val urlGenerator by lazy {
-        UrlGenerator(
-            schema = schema,
-            host = host,
-            port = port,
-            domainSuffix = domainSuffix,
-            symbol = symbol,
-            schoolId = schoolId,
-        )
-    }
 
     private val loginHelper by lazy {
         LoginHelper(
@@ -162,7 +146,7 @@ internal class ServiceManager(
     }
 
     private fun prepareStudentHttpClient(withLogin: Boolean, studentInterceptor: Boolean): OkHttpClient.Builder {
-        if (withLogin && schoolId.isBlank()) throw ScrapperException("School id is not set")
+        if (withLogin && urlGenerator.schoolId.isBlank()) throw ScrapperException("School id is not set")
 
         val client = getClientBuilder(loginIntercept = withLogin)
         if (studentInterceptor) {
