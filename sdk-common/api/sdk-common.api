@@ -3,3 +3,8 @@ public final class io/github/wulkanowy/sdk/common/exception/UnavailableFeatureEx
 	public fun <init> (Ljava/lang/String;)V
 }
 
+public final class io/github/wulkanowy/sdk/common/interceptor/NullInterceptor : okhttp3/Interceptor {
+	public static final field INSTANCE Lio/github/wulkanowy/sdk/common/interceptor/NullInterceptor;
+	public fun intercept (Lokhttp3/Interceptor$Chain;)Lokhttp3/Response;
+}
+

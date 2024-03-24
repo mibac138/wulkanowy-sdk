@@ -1,5 +1,6 @@
 package io.github.wulkanowy.sdk.scrapper.service
 
+import io.github.wulkanowy.sdk.common.interceptor.NullInterceptor
 import io.github.wulkanowy.sdk.scrapper.CookieJarCabinet
 import io.github.wulkanowy.sdk.scrapper.OkHttpClientBuilderFactory
 import io.github.wulkanowy.sdk.scrapper.Scrapper
@@ -10,7 +11,6 @@ import io.github.wulkanowy.sdk.scrapper.interceptor.EmptyCookieJarInterceptor
 import io.github.wulkanowy.sdk.scrapper.interceptor.ErrorInterceptor
 import io.github.wulkanowy.sdk.scrapper.interceptor.HttpErrorInterceptor
 import io.github.wulkanowy.sdk.scrapper.interceptor.ModuleHeaders
-import io.github.wulkanowy.sdk.scrapper.interceptor.NullInterceptor
 import io.github.wulkanowy.sdk.scrapper.interceptor.StudentCookieInterceptor
 import io.github.wulkanowy.sdk.scrapper.login.LoginHelper
 import io.github.wulkanowy.sdk.scrapper.login.LoginResult
@@ -85,10 +85,9 @@ internal class ServiceManager(
     private val interceptors: MutableList<Pair<Interceptor, Boolean>> = mutableListOf(
         ErrorInterceptor(cookieJarCabinet) to false,
         AutoLoginInterceptor(
-            loginLock = loginLock,
-            headersByHost = headersByHost,
             loginType = loginType,
             loginLock = loginLock,
+            headersByHost = headersByHost,
             notLoggedInCallback = ::userLogin,
             fetchModuleCookies = { site -> loginHelper.loginModule(site) },
         ) to false,
