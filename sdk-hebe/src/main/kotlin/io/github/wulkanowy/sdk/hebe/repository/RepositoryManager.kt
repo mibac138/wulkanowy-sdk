@@ -1,5 +1,6 @@
 package io.github.wulkanowy.sdk.hebe.repository
 
+import io.github.wulkanowy.sdk.hebe.interceptor.DeviceModelInterceptor
 import io.github.wulkanowy.sdk.hebe.interceptor.ErrorInterceptor
 import io.github.wulkanowy.sdk.hebe.interceptor.SignInterceptor
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -79,7 +80,8 @@ internal class RepositoryManager(
                 OkHttpClient().newBuilder()
                     .apply {
                         if (signInterceptor) {
-                            addInterceptor(SignInterceptor(keyId, privatePem, deviceModel))
+                            addInterceptor(DeviceModelInterceptor(deviceModel))
+                            addInterceptor(SignInterceptor(keyId, privatePem))
                         }
                         interceptors.forEach {
                             when {

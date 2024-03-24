@@ -11,17 +11,11 @@ import java.time.ZonedDateTime
 internal class SignInterceptor(
     private val keyId: String,
     private val privatePem: String,
-    private val deviceModel: String,
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val original = chain.request()
         val request = original.newBuilder()
-
-        request.header("User-Agent", "Dart/2.10 (dart:io)")
-        request.header("vOS", "Android")
-        request.header("vDeviceModel", deviceModel)
-        request.header("vAPI", "1")
 
         if (privatePem.isNotBlank()) {
             val signatureHeaders = Buffer().run {
