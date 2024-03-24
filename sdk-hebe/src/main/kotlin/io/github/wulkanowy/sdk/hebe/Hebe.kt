@@ -12,7 +12,7 @@ import okhttp3.Interceptor
 import okhttp3.logging.HttpLoggingInterceptor
 import java.time.LocalDate
 
-class Hebe {
+class Hebe(val baseUrl: String = "", val schoolId: String = "", val pupilId: Int = -1, val deviceModel: String = "") {
 
     private val resettableManager = resettableManager()
 
@@ -34,29 +34,6 @@ class Hebe {
             resettableManager.reset()
         }
 
-    var baseUrl = ""
-        set(value) {
-            field = value
-            resettableManager.reset()
-        }
-
-    var schoolId = ""
-        set(value) {
-            field = value
-            resettableManager.reset()
-        }
-
-    var pupilId = -1
-        set(value) {
-            field = value
-            resettableManager.reset()
-        }
-
-    var deviceModel = ""
-        set(value) {
-            field = value
-            resettableManager.reset()
-        }
 
     private val appInterceptors: MutableList<Pair<Interceptor, Boolean>> = mutableListOf()
 

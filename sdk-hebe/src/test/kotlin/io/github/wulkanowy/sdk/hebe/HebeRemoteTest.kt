@@ -11,7 +11,7 @@ import java.time.LocalDate
 @Ignore
 class HebeRemoteTest {
 
-    private val hebe = Hebe()
+    private val hebe = Hebe(baseUrl = "https://api.fakelog.cf/powiatwulkanowy/", pupilId = 1234, schoolId = "008520", deviceModel = "Pixel 4a (5G)")
 
     @Before
     fun setUp() {
@@ -19,10 +19,6 @@ class HebeRemoteTest {
             logLevel = HttpLoggingInterceptor.Level.BODY
             keyId = "///"
             privatePem = "///"
-            baseUrl = "https://api.fakelog.cf/powiatwulkanowy/"
-            pupilId = 1234
-            schoolId = "008520"
-            deviceModel = "Pixel 4a (5G)"
         }
     }
 

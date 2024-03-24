@@ -1,5 +1,7 @@
 public final class io/github/wulkanowy/sdk/hebe/Hebe {
 	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;ILjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
 	public final fun addInterceptor (Lokhttp3/Interceptor;Z)V
 	public static synthetic fun addInterceptor$default (Lio/github/wulkanowy/sdk/hebe/Hebe;Lokhttp3/Interceptor;ZILjava/lang/Object;)V
 	public final fun getBaseUrl ()Ljava/lang/String;
@@ -16,13 +18,9 @@ public final class io/github/wulkanowy/sdk/hebe/Hebe {
 	public final fun getStudents (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun register (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public static synthetic fun register$default (Lio/github/wulkanowy/sdk/hebe/Hebe;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
-	public final fun setBaseUrl (Ljava/lang/String;)V
-	public final fun setDeviceModel (Ljava/lang/String;)V
 	public final fun setKeyId (Ljava/lang/String;)V
 	public final fun setLogLevel (Lokhttp3/logging/HttpLoggingInterceptor$Level;)V
 	public final fun setPrivatePem (Ljava/lang/String;)V
-	public final fun setPupilId (I)V
-	public final fun setSchoolId (Ljava/lang/String;)V
 }
 
 public final class io/github/wulkanowy/sdk/hebe/exception/InvalidPinException : java/io/IOException {

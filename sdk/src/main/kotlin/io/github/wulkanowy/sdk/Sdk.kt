@@ -99,32 +99,14 @@ class Sdk internal constructor(private val config: SdkConfig) {
     }
 
     private val scrapper: Scrapper
-    private val hebe = Hebe()
+    private val hebe: Hebe
 
     private val registerTimeZone = ZoneId.of("Europe/Warsaw")
 
     var mode = Mode.SCRAPPER
 
     init {
-        config.hebeConfig?.let {
-            hebe.baseUrl = it.baseUrl
-            hebe.keyId = it.keyId
-            hebe.privatePem = it.privatePem
-            hebe.schoolId = config.schoolSymbol!!
-            hebe.pupilId = config.studentId!!
-            hebe.deviceModel = it.deviceModel
-            when (val logStyle = it.logStyle) {
-                is LogStyle.Level -> {
-                    hebe.logLevel = logStyle.level
-                }
-
-                is LogStyle.Custom -> {
-                    hebe.logLevel = HttpLoggingInterceptor.Level.NONE
-                    val interceptor = HttpLoggingInterceptor(logStyle.logger).setLevel(HttpLoggingInterceptor.Level.BASIC)
-                    hebe.addInterceptor(interceptor)
-                }
-            }
-        }
+        hebe = config.createHebeIfConfigured() ?: Hebe()
         scrapper = config.createScrapperIfConfigured() ?: Scrapper()
     }
 
@@ -671,6 +653,25 @@ class SdkConfig {
             loginType = it.loginType,
             emptyCookieJarInterceptor = it.emptyCookieJarInterceptor,
         ).also { scrapper -> scrapper.isEduOne = it.isEduOne }
+    }
+
+    internal fun createHebeIfConfigured(): Hebe? = hebeConfig?.let {
+        val hebe = Hebe(baseUrl = it.baseUrl, schoolId = schoolSymbol!!, pupilId = studentId!!, deviceModel = it.deviceModel)
+        hebe.keyId = it.keyId
+        hebe.privatePem = it.privatePem
+        when (val logStyle = it.logStyle) {
+            is LogStyle.Level -> {
+                hebe.logLevel = logStyle.level
+            }
+
+            is LogStyle.Custom -> {
+                hebe.logLevel = HttpLoggingInterceptor.Level.NONE
+                val interceptor = HttpLoggingInterceptor(logStyle.logger).setLevel(HttpLoggingInterceptor.Level.BASIC)
+                hebe.addInterceptor(interceptor)
+            }
+        }
+
+        hebe
     }
 }
 
