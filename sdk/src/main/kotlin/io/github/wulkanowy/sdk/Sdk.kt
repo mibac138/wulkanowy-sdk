@@ -131,8 +131,8 @@ class Sdk internal constructor(private val config: SdkConfig) {
     val userAgent: String
         get() = scrapper.userAgent
 
-    fun addInterceptor(interceptor: Interceptor, network: Boolean = false) {
-        scrapper.addInterceptor(interceptor, network)
+    // TODO bring architectural improvements to hebe too
+    fun addHebeInterceptor(interceptor: Interceptor, network: Boolean = false) {
         hebe.addInterceptor(interceptor, network)
     }
 

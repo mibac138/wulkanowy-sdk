@@ -48,14 +48,13 @@ import io.github.wulkanowy.sdk.scrapper.student.StudentInfo
 import io.github.wulkanowy.sdk.scrapper.student.StudentPhoto
 import io.github.wulkanowy.sdk.scrapper.timetable.CompletedLesson
 import io.github.wulkanowy.sdk.scrapper.timetable.Timetable
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import java.net.CookieManager
 import java.time.LocalDate
 import java.util.concurrent.locks.ReentrantLock
 
-private val httpClientWithBasicLogging = OkHttpClient().newBuilder().addNetworkInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)).build()
+internal val httpClientWithBasicLogging = OkHttpClient().newBuilder().addNetworkInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BASIC)).build()
 
 class Scrapper(
     val urlGenerator: UrlGenerator = UrlGenerator.Empty,
@@ -88,36 +87,25 @@ class Scrapper(
 
     var isEduOne = false
 
-    private val appInterceptors: MutableList<Pair<Interceptor, Boolean>> = mutableListOf()
-
-    fun addInterceptor(interceptor: Interceptor, network: Boolean = false) {
-        appInterceptors.add(interceptor to network)
-    }
-
     private val okHttpFactory = OkHttpClientBuilderFactory(host = urlGenerator.host, base = httpClient, userAgent = userAgent)
 
     private val headersByHost: MutableMap<String, ModuleHeaders> = mutableMapOf()
     private val loginLock = ReentrantLock(true)
-    private val serviceManager =
-        ServiceManager(
-            okHttpClientBuilderFactory = okHttpFactory,
-            cookieJarCabinet = cookieJarCabinet,
-            loginType = loginType,
-            urlGenerator = urlGenerator,
-            email = email,
-            password = password,
-            studentId = studentId,
-            diaryId = diaryId,
-            kindergartenDiaryId = kindergartenDiaryId,
-            schoolYear = schoolYear,
-            emptyCookieJarIntercept = emptyCookieJarInterceptor,
-            loginLock = loginLock,
-            headersByHost = headersByHost,
-        ).apply {
-            appInterceptors.forEach { (interceptor, isNetwork) ->
-                setInterceptor(interceptor, isNetwork)
-            }
-        }
+    private val serviceManager = ServiceManager(
+        okHttpClientBuilderFactory = okHttpFactory,
+        cookieJarCabinet = cookieJarCabinet,
+        loginType = loginType,
+        urlGenerator = urlGenerator,
+        email = email,
+        password = password,
+        studentId = studentId,
+        diaryId = diaryId,
+        kindergartenDiaryId = kindergartenDiaryId,
+        schoolYear = schoolYear,
+        emptyCookieJarIntercept = emptyCookieJarInterceptor,
+        loginLock = loginLock,
+        headersByHost = headersByHost,
+    )
 
     private val symbolRepository by lazy { SymbolRepository(serviceManager.getSymbolService()) }
 

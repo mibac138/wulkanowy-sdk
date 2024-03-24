@@ -2,8 +2,6 @@ public final class io/github/wulkanowy/sdk/scrapper/Scrapper {
 	public fun <init> ()V
 	public fun <init> (Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator;Ljava/lang/String;Lokhttp3/OkHttpClient;Lio/github/wulkanowy/sdk/scrapper/Scrapper$LoginType;Ljava/lang/String;Ljava/lang/String;IIIIIIZ)V
 	public synthetic fun <init> (Lio/github/wulkanowy/sdk/scrapper/login/UrlGenerator;Ljava/lang/String;Lokhttp3/OkHttpClient;Lio/github/wulkanowy/sdk/scrapper/Scrapper$LoginType;Ljava/lang/String;Ljava/lang/String;IIIIIIZILkotlin/jvm/internal/DefaultConstructorMarker;)V
-	public final fun addInterceptor (Lokhttp3/Interceptor;Z)V
-	public static synthetic fun addInterceptor$default (Lio/github/wulkanowy/sdk/scrapper/Scrapper;Lokhttp3/Interceptor;ZILjava/lang/Object;)V
 	public final fun authorizePermission (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun deleteMessages (Ljava/util/List;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
 	public final fun excuseForAbsence (Ljava/util/List;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;

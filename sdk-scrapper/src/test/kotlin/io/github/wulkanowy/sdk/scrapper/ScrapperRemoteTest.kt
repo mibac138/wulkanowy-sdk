@@ -9,7 +9,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import java.time.LocalDate
@@ -20,6 +19,10 @@ class ScrapperRemoteTest : BaseTest() {
 
     private var api = Scrapper(
         userAgent = androidUserAgentString("9.0", buildTag = "Wulkanowy"),
+        httpClient = httpClientWithBasicLogging.newBuilder().addNetworkInterceptor {
+            println("Request event ${it.request().url.host}")
+            it.proceed(it.request())
+        }.build(),
         urlGenerator = UrlGenerator(schema = "https", host = "fakelog.cf", symbol = "powiatwulkanowy", schoolId = "123456"),
         loginType = Scrapper.LoginType.STANDARD,
         email = "jan@fakelog.cf",
@@ -30,19 +33,6 @@ class ScrapperRemoteTest : BaseTest() {
         classId = 1,
         emptyCookieJarInterceptor = false,
     )
-
-    @Before
-    fun setUp() {
-        api.apply {
-            addInterceptor(
-                interceptor = {
-                    println("Request event ${it.request().url.host}")
-                    it.proceed(it.request())
-                },
-                network = true,
-            )
-        }
-    }
 
     @Test
     fun getPasswordResetCaptchaCode() {
