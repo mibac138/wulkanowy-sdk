@@ -183,14 +183,11 @@ class AutoLoginInterceptorTest : BaseLocalTest() {
     }
 
     private fun getService(
-        checkJar: Boolean = false,
         fetchModuleCookies: (UrlGenerator.Site) -> Pair<HttpUrl, Document> = { _ -> "http://localhost".toHttpUrl() to Document("") },
         notLoggedInCallback: suspend () -> LoginResult = { loginHelper.login("", "") },
     ): StudentService {
         val interceptor = AutoLoginInterceptor(
             loginType = Scrapper.LoginType.STANDARD,
-            cookieJarCabinet = CookieJarCabinet(),
-            emptyCookieJarIntercept = checkJar,
             notLoggedInCallback = notLoggedInCallback,
             fetchModuleCookies = fetchModuleCookies,
         )

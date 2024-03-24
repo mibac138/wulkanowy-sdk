@@ -23,10 +23,6 @@ internal class CookieJarCabinet {
 
     private var additionalCookieManager: CookieManager? = null
 
-    fun isUserCookiesExist(): Boolean {
-        return userCookieManager.cookieStore.cookies.isNotEmpty()
-    }
-
     fun onRegisterUserLogout() {
         clearUserCookieStore()
     }

@@ -1,6 +1,5 @@
 package io.github.wulkanowy.sdk.scrapper.interceptor
 
-import io.github.wulkanowy.sdk.scrapper.CookieJarCabinet
 import io.github.wulkanowy.sdk.scrapper.Scrapper.LoginType
 import io.github.wulkanowy.sdk.scrapper.Scrapper.LoginType.ADFS
 import io.github.wulkanowy.sdk.scrapper.Scrapper.LoginType.ADFSCards
@@ -49,8 +48,6 @@ internal class AutoLoginInterceptor(
     private val loginType: LoginType,
     private val headersByHost: MutableMap<String, ModuleHeaders> = mutableMapOf(),
     private val loginLock: ReentrantLock = ReentrantLock(true),
-    private val cookieJarCabinet: CookieJarCabinet,
-    private val emptyCookieJarIntercept: Boolean = false,
     private val notLoggedInCallback: suspend () -> LoginResult,
     private val fetchModuleCookies: (UrlGenerator.Site) -> Pair<HttpUrl, Document>,
 ) : Interceptor {
@@ -68,7 +65,6 @@ internal class AutoLoginInterceptor(
 
         return try {
             val request = chain.request()
-            checkRequest()
             val response = try {
                 chain.proceed(request.attachModuleHeaders())
             } catch (e: Throwable) {
@@ -171,12 +167,6 @@ internal class AutoLoginInterceptor(
             .addHeader("X-V-AppGuid", headers.appGuid)
             .addHeader("X-V-AppVersion", headers.appVersion)
             .build()
-    }
-
-    private fun checkRequest() {
-        if (emptyCookieJarIntercept && !cookieJarCabinet.isUserCookiesExist()) {
-            throw NotLoggedInException("No cookie found! You are not logged in yet")
-        }
     }
 
     private fun checkResponse(doc: Document, url: String) {
