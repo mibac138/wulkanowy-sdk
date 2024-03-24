@@ -1,6 +1,5 @@
 package io.github.wulkanowy.sdk.scrapper.login
 
-import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator.Site.BASE
 import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator.Site.HOME
 import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator.Site.LOGIN
 import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator.Site.MESSAGES
@@ -19,7 +18,6 @@ internal class UrlGenerator(
     constructor(url: URL, domainSuffix: String, symbol: String, schoolId: String) : this(url.protocol, url.host, domainSuffix, symbol, schoolId)
 
     enum class Site {
-        BASE,
         LOGIN,
         HOME,
         STUDENT,
@@ -35,8 +33,9 @@ internal class UrlGenerator(
         val EMPTY = UrlGenerator("https", "fakelog.cf", "", "powiatwulkanowy", "")
     }
 
+    fun getReferenceUrl() = "$schema://$host"
+
     fun generate(type: Site): String {
-        if (type == BASE) return "$schema://$host"
         return "${generateBase(type).removeSuffix("/")}/$symbol/${if (type.isStudent) "$schoolId/" else ""}"
     }
 
@@ -59,7 +58,6 @@ internal class UrlGenerator(
             STUDENT -> "uonetplus-uczen"
             STUDENT_PLUS -> "uonetplus-uczenplus"
             MESSAGES -> "uonetplus-wiadomosciplus"
-            else -> error("unknown")
         }
     }
 }
