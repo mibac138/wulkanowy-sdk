@@ -207,7 +207,7 @@ internal class RegisterRepository(
             .onFailure { if (it is InvalidSymbolException) throw it }
 
         val urlGenerator = url.also { it.symbol = symbol }
-        val page = register.getFormType(urlGenerator.generate(UrlGenerator.Site.LOGIN) + "Account/LogOn").page
+        val page = register.getFormType(urlGenerator.generateWithSymbol(UrlGenerator.Site.LOGIN) + "Account/LogOn").page
         return when {
             page.select(SELECTOR_STANDARD).isNotEmpty() -> Scrapper.LoginType.STANDARD
             page.select(SELECTOR_ADFS).isNotEmpty() -> Scrapper.LoginType.ADFS
@@ -281,7 +281,7 @@ internal class RegisterRepository(
 
     // used only for check is student from parent account
     private suspend fun isStudentFromParentAccount(): Boolean? {
-        val studentPageUrl = url.generate(UrlGenerator.Site.STUDENT) + "LoginEndpoint.aspx"
+        val studentPageUrl = url.generateWithSymbol(UrlGenerator.Site.STUDENT) + "LoginEndpoint.aspx"
         val start = student.getStart(studentPageUrl)
 
         val startPage = when {
@@ -302,7 +302,7 @@ internal class RegisterRepository(
         }
 
         val userCache = student.getUserCache(
-            url = url.generate(UrlGenerator.Site.STUDENT) + "UczenCache.mvc/Get",
+            url = url.generateWithSymbol(UrlGenerator.Site.STUDENT) + "UczenCache.mvc/Get",
             token = getScriptParam("antiForgeryToken", startPage),
             appGuid = getScriptParam("appGuid", startPage),
             appVersion = getScriptParam("version", startPage),
@@ -312,12 +312,12 @@ internal class RegisterRepository(
     }
 
     private suspend fun getStudentDiaries(): List<Diary> = student
-        .getSchoolInfo(url.generate(UrlGenerator.Site.STUDENT) + "UczenDziennik.mvc/Get")
+        .getSchoolInfo(url.generateWithSymbol(UrlGenerator.Site.STUDENT) + "UczenDziennik.mvc/Get")
         .handleErrors()
         .data.orEmpty()
 
     private suspend fun getEduOneDiaries(): List<Pair<Boolean, Diary>> {
-        val baseStudentPlus = url.generate(UrlGenerator.Site.STUDENT_PLUS)
+        val baseStudentPlus = url.generateWithSymbol(UrlGenerator.Site.STUDENT_PLUS)
         val studentPageUrl = baseStudentPlus + "LoginEndpoint.aspx"
         val start = student.getStart(studentPageUrl)
 

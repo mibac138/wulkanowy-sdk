@@ -146,13 +146,13 @@ internal class ServiceManager(
         if (email.isBlank() && password.isBlank()) throw ScrapperException("Email and password are not set")
         if (email.isBlank()) throw ScrapperException("Email is not set")
         if (password.isBlank()) throw ScrapperException("Password is not set")
-        return getRetrofit(getClientBuilder(loginIntercept = false), urlGenerator.generate(UrlGenerator.Site.LOGIN), false).create()
+        return getRetrofit(getClientBuilder(loginIntercept = false), urlGenerator.generateWithSymbol(UrlGenerator.Site.LOGIN), false).create()
     }
 
     fun getAccountService(): AccountService {
         return getRetrofit(
             client = getClientBuilder(errIntercept = false, loginIntercept = false, separateJar = true),
-            baseUrl = urlGenerator.generate(UrlGenerator.Site.LOGIN),
+            baseUrl = urlGenerator.generateWithSymbol(UrlGenerator.Site.LOGIN),
             json = false,
         ).create()
     }
@@ -160,7 +160,7 @@ internal class ServiceManager(
     fun getRegisterService(): RegisterService {
         return getRetrofit(
             client = getClientBuilder(errIntercept = true, loginIntercept = false, separateJar = true),
-            baseUrl = urlGenerator.generate(UrlGenerator.Site.LOGIN),
+            baseUrl = urlGenerator.generateWithSymbol(UrlGenerator.Site.LOGIN),
             json = false,
         ).create()
     }
@@ -168,7 +168,7 @@ internal class ServiceManager(
     fun getStudentService(withLogin: Boolean = true, studentInterceptor: Boolean = true): StudentService {
         return getRetrofit(
             client = prepareStudentHttpClient(withLogin, studentInterceptor),
-            baseUrl = urlGenerator.generate(UrlGenerator.Site.STUDENT),
+            baseUrl = urlGenerator.generateWithSymbol(UrlGenerator.Site.STUDENT),
             json = true,
         ).create()
     }
@@ -176,7 +176,7 @@ internal class ServiceManager(
     fun getStudentPlusService(withLogin: Boolean = true): StudentPlusService {
         return getRetrofit(
             client = getClientBuilder(loginIntercept = withLogin),
-            baseUrl = urlGenerator.generate(UrlGenerator.Site.STUDENT_PLUS),
+            baseUrl = urlGenerator.generateWithSymbol(UrlGenerator.Site.STUDENT_PLUS),
             json = true,
         ).create()
     }
@@ -210,13 +210,13 @@ internal class ServiceManager(
     fun getMessagesService(withLogin: Boolean = true): MessagesService {
         return getRetrofit(
             client = getClientBuilder(loginIntercept = withLogin),
-            baseUrl = urlGenerator.generate(UrlGenerator.Site.MESSAGES),
+            baseUrl = urlGenerator.generateWithSymbol(UrlGenerator.Site.MESSAGES),
             json = true,
         ).create()
     }
 
     fun getHomepageService(): HomepageService {
-        return getRetrofit(getClientBuilder(), urlGenerator.generate(UrlGenerator.Site.HOME), json = true).create()
+        return getRetrofit(getClientBuilder(), urlGenerator.generateWithSymbol(UrlGenerator.Site.HOME), json = true).create()
     }
 
     private fun getRetrofit(client: OkHttpClient.Builder, baseUrl: String, json: Boolean = false) = Retrofit.Builder()

@@ -82,7 +82,7 @@ internal class LoginHelper(
     }
 
     fun loginModule(site: UrlGenerator.Site): Pair<HttpUrl, Document> {
-        val moduleUrl = urlGenerator.generate(site) + "LoginEndpoint.aspx"
+        val moduleUrl = urlGenerator.generateWithSymbol(site) + "LoginEndpoint.aspx"
         val startHtml = api.getModuleStart(moduleUrl).execute().handleErrors().body().orEmpty()
         val startDoc = Jsoup.parse(startHtml)
 

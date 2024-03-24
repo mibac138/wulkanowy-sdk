@@ -143,7 +143,7 @@ fun androidUserAgentString(androidVersion: String = "7.0", buildTag: String = "S
 internal fun isCurrentLoginHasEduOne(studentModuleUrls: List<String>, urlGenerator: UrlGenerator): Boolean {
     return studentModuleUrls.any {
         it.startsWith(
-            prefix = urlGenerator.generate(UrlGenerator.Site.STUDENT_PLUS),
+            prefix = urlGenerator.generateWithSymbol(UrlGenerator.Site.STUDENT_PLUS),
             ignoreCase = true,
         )
     }

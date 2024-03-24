@@ -92,7 +92,7 @@ internal class AccountRepository(private val account: AccountService) {
     }
 
     private suspend fun getLoginType(urlGenerator: UrlGenerator): Scrapper.LoginType {
-        val page = account.getFormType(urlGenerator.generate(UrlGenerator.Site.LOGIN) + "Account/LogOn").page
+        val page = account.getFormType(urlGenerator.generateWithSymbol(UrlGenerator.Site.LOGIN) + "Account/LogOn").page
 
         return when {
             page.select(SELECTOR_STANDARD).isNotEmpty() -> STANDARD

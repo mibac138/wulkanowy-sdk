@@ -31,7 +31,7 @@ internal class UrlGenerator(
 
     fun getReferenceUrl() = "$schema://$host"
 
-    fun generate(type: Site): String {
+    fun generateWithSymbol(type: Site): String {
         return "${generateBase(type).removeSuffix("/")}/$symbol/${if (type.isStudent) "$schoolId/" else ""}"
     }
 
