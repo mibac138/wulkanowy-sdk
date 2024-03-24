@@ -128,7 +128,7 @@ class Sdk internal constructor(config: SdkConfig) {
         if (config.scrapperConfig != null) {
             val it = config.scrapperConfig!!
             val loggingInterceptor = it.logStyle.toLoggingInterceptor()
-            val httpClient = OkHttpClient().newBuilder().addNetworkInterceptor(loggingInterceptor).build()
+            val httpClient = it.httpClient.newBuilder().addNetworkInterceptor(loggingInterceptor).build()
             scrapper = Scrapper(userAgent = it.userAgent, httpClient = httpClient)
             scrapper.urlGenerator = UrlGenerator(url = URL(it.baseUrl), domainSuffix = it.domainSuffix, schoolId = config.schoolSymbol!!, symbol = it.symbol)
             scrapper.isEduOne = it.isEduOne
@@ -624,6 +624,7 @@ class HebeConfig : CommonSdkConfig() {
 }
 
 class ScrapperConfig : CommonSdkConfig() {
+    var httpClient = OkHttpClient()
     var baseUrl = ""
     var domainSuffix: String = ""
     var isEduOne = false

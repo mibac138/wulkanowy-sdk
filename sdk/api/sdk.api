@@ -39,6 +39,7 @@ public final class io/github/wulkanowy/sdk/ScrapperConfig : io/github/wulkanowy/
 	public final fun getDomainSuffix ()Ljava/lang/String;
 	public final fun getEmail ()Ljava/lang/String;
 	public final fun getEmptyCookieJarInterceptor ()Z
+	public final fun getHttpClient ()Lokhttp3/OkHttpClient;
 	public final fun getKindergartenDiaryId ()I
 	public final fun getLoginType ()Lio/github/wulkanowy/sdk/scrapper/Scrapper$LoginType;
 	public final fun getPassword ()Ljava/lang/String;
@@ -54,6 +55,7 @@ public final class io/github/wulkanowy/sdk/ScrapperConfig : io/github/wulkanowy/
 	public final fun setEduOne (Z)V
 	public final fun setEmail (Ljava/lang/String;)V
 	public final fun setEmptyCookieJarInterceptor (Z)V
+	public final fun setHttpClient (Lokhttp3/OkHttpClient;)V
 	public final fun setKindergartenDiaryId (I)V
 	public final fun setLoginType (Lio/github/wulkanowy/sdk/scrapper/Scrapper$LoginType;)V
 	public final fun setPassword (Ljava/lang/String;)V
