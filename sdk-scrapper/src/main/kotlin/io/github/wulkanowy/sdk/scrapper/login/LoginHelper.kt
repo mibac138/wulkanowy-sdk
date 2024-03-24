@@ -31,6 +31,11 @@ import java.time.format.DateTimeFormatterBuilder
 import java.time.temporal.ChronoUnit
 import java.util.Locale
 
+private val instantFormatter = DateTimeFormatterBuilder()
+    .parseCaseInsensitive()
+    .appendInstant(0)
+    .toFormatter(Locale.US)
+
 internal class LoginHelper(
     var loginType: Scrapper.LoginType,
     private val cookieJarCabinet: CookieJarCabinet,
@@ -58,11 +63,6 @@ internal class LoginHelper(
     init {
         logger.debug(toString())
     }
-
-    private val instantFormatter = DateTimeFormatterBuilder()
-        .parseCaseInsensitive()
-        .appendInstant(0)
-        .toFormatter(Locale.US)
 
     private val certificateAdapter by lazy {
         Jspoon.create().adapter(CertificateResponse::class.java)
