@@ -217,14 +217,14 @@ class Scrapper(
             classId = classId,
             unitId = unitId,
             api = serviceManager.getStudentService(withLogin = true, studentInterceptor = false),
-            urlGenerator = serviceManager.urlGenerator,
+            forceSignIn = { serviceManager.loginModule(UrlGenerator.Site.STUDENT) },
         )
     }
 
     private val student: StudentRepository by resettableLazy(changeManager) {
         StudentRepository(
             api = serviceManager.getStudentService(),
-            urlGenerator = serviceManager.urlGenerator,
+            forceSignIn = { serviceManager.loginModule(UrlGenerator.Site.STUDENT) },
         )
     }
 
@@ -237,7 +237,7 @@ class Scrapper(
     private val messages: MessagesRepository by resettableLazy(changeManager) {
         MessagesRepository(
             api = serviceManager.getMessagesService(),
-            urlGenerator = serviceManager.urlGenerator,
+            forceSignIn = { serviceManager.loginModule(UrlGenerator.Site.MESSAGES) },
         )
     }
 

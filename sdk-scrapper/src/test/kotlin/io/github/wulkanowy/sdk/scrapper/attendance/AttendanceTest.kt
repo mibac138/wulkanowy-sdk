@@ -16,7 +16,6 @@ class AttendanceTest : BaseLocalTest() {
 
     private val student by lazy {
         val repo = getStudentRepo {
-            it.enqueue("WitrynaUcznia.html", RegisterTest::class.java)
             it.enqueue("UczenCache.json", RegisterTest::class.java)
             it.enqueue("Frekwencja.json", AttendanceTest::class.java)
         }
@@ -158,7 +157,6 @@ class AttendanceTest : BaseLocalTest() {
     @Test
     fun getAttendance_requestDateFormat() = runTest {
         val beforeRequests = mapOf(
-            "WitrynaUcznia.html" to RegisterTest::class,
             "UczenCache.json" to RegisterTest::class,
         )
 
@@ -197,17 +195,12 @@ class AttendanceTest : BaseLocalTest() {
             ),
         )
 
-        val beforeRequests = mapOf(
-            "WitrynaUcznia.html" to RegisterTest::class,
-        )
         getStudentRepo {
-            beforeRequests.forEach { (file, clazz) -> it.enqueue(file, clazz.java) }
             it.enqueue("Usprawiedliwione.json", AttendanceTest::class.java)
         }.excuseForAbsence(
             absents = absents,
             content = "Test",
         )
-        repeat(beforeRequests.size) { server.takeRequest() }
         val request = server.takeRequest()
 
         val expected = Json.decodeFromString<AttendanceExcuseRequest>(AttendanceTest::class.java.getResource("Usprawiedliwienie.json")!!.readText())

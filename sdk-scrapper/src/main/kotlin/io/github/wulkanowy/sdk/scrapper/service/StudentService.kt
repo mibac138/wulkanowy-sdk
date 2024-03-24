@@ -50,10 +50,6 @@ internal interface StudentService {
     @GET
     suspend fun getStart(@Url url: String): String
 
-    @GET("LoginEndpoint.aspx")
-    suspend fun getModuleStart(): String
-
-    @POST
     @FormUrlEncoded
     suspend fun sendModuleCertificate(
         @Header("Referer") referer: String,

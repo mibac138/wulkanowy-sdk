@@ -1,7 +1,5 @@
 package io.github.wulkanowy.sdk.scrapper.repository
 
-import io.github.wulkanowy.sdk.scrapper.login.CertificateResponse
-import io.github.wulkanowy.sdk.scrapper.login.UrlGenerator
 import io.github.wulkanowy.sdk.scrapper.messages.Mailbox
 import io.github.wulkanowy.sdk.scrapper.messages.MessageDetails
 import io.github.wulkanowy.sdk.scrapper.messages.MessageMeta
@@ -13,20 +11,13 @@ import io.github.wulkanowy.sdk.scrapper.parseName
 import io.github.wulkanowy.sdk.scrapper.service.MessagesService
 import io.github.wulkanowy.sdk.scrapper.toMailbox
 import io.github.wulkanowy.sdk.scrapper.toRecipient
-import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
-import pl.droidsonroids.jspoon.Jspoon
-import java.io.IOException
 import java.util.UUID
 
 internal class MessagesRepository(
     private val api: MessagesService,
-    private val urlGenerator: UrlGenerator,
+    private val forceSignIn: suspend () -> Unit = {},
 ) {
-
-    private val certificateAdapter by lazy {
-        Jspoon.create().adapter(CertificateResponse::class.java)
-    }
 
     companion object {
         @JvmStatic
@@ -91,7 +82,7 @@ internal class MessagesRepository(
         val details = api.getMessageDetails(globalKey)
         if (markAsRead) {
             runCatching {
-                loginModule()
+                forceSignIn()
                 api.markMessageAsRead(mapOf("apiGlobalKey" to globalKey))
             }
                 .onFailure { logger.error("Error occur while marking message as read", it) }
@@ -101,7 +92,7 @@ internal class MessagesRepository(
     }
 
     suspend fun sendMessage(subject: String, content: String, recipients: List<String>, senderMailboxId: String) {
-        loginModule()
+        forceSignIn()
         val body = SendMessageRequest(
             globalKey = UUID.randomUUID().toString(),
             threadGlobalKey = UUID.randomUUID().toString(),
@@ -118,7 +109,7 @@ internal class MessagesRepository(
     }
 
     suspend fun deleteMessages(globalKeys: List<String>, removeForever: Boolean) {
-        loginModule()
+        forceSignIn()
         when {
             !removeForever -> api.moveMessageToTrash(globalKeys)
             else -> api.deleteMessage(globalKeys)
@@ -127,32 +118,5 @@ internal class MessagesRepository(
 
     suspend fun restoreFromTrash(globalKeys: List<String>) {
         api.restoreFromTrash(globalKeys)
-    }
-
-    private suspend fun loginModule() {
-        val site = UrlGenerator.Site.MESSAGES
-        val startHtml = api.getModuleStart()
-        val startDoc = Jsoup.parse(startHtml)
-
-        if ("Working" in startDoc.title()) {
-            val cert = certificateAdapter.fromHtml(startHtml)
-            val certResponseHtml = api.sendModuleCertificate(
-                referer = urlGenerator.createReferer(site),
-                url = cert.action,
-                certificate = mapOf(
-                    "wa" to cert.wa,
-                    "wresult" to cert.wresult,
-                    "wctx" to cert.wctx,
-                ),
-            )
-            val certResponseDoc = Jsoup.parse(certResponseHtml)
-            if ("antiForgeryToken" !in certResponseHtml) {
-                throw IOException("Unknown module start page: ${certResponseDoc.title()}")
-            } else {
-                logger.debug("{} cookies fetch successfully!", site)
-            }
-        } else {
-            logger.debug("{} cookies already fetched!", site)
-        }
     }
 }

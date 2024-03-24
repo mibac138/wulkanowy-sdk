@@ -75,6 +75,10 @@ internal class ServiceManager(
         return loginHelper.login(email, password)
     }
 
+    suspend fun loginModule(site: UrlGenerator.Site) {
+        loginHelper.loginModule(site)
+    }
+
     private val interceptors: MutableList<Pair<Interceptor, Boolean>> = mutableListOf(
         ErrorInterceptor(cookieJarCabinet) to false,
         AutoLoginInterceptor(
